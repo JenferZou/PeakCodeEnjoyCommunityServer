@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jenfer.mappers.SysSettingMapper">
+
+    <resultMap id="BaseResultMap" type="com.jenfer.pojo.SysSetting">
+            <id property="code" column="code" jdbcType="VARCHAR"/>
+            <result property="json_content" column="json_content" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        code,json_content
+    </sql>
+</mapper>

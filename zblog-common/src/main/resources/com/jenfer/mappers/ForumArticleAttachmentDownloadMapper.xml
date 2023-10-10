@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jenfer.mappers.ForumArticleAttachmentDownloadMapper">
+
+    <resultMap id="BaseResultMap" type="com.jenfer.pojo.ForumArticleAttachmentDownload">
+            <id property="file_id" column="file_id" jdbcType="VARCHAR"/>
+            <id property="user_id" column="user_id" jdbcType="VARCHAR"/>
+            <result property="article_id" column="article_id" jdbcType="VARCHAR"/>
+            <result property="download_count" column="download_count" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        file_id,user_id,article_id,
+        download_count
+    </sql>
+</mapper>

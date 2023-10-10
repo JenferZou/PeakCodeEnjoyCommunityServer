@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jenfer.mappers.ForumBoardMapper">
+
+<!--    <resultMap id="BaseResultMap" type="com.jenfer.pojo.ForumBoard">-->
+<!--            <id property="board_id" column="board_id" jdbcType="INTEGER"/>-->
+<!--            <result property="p_board_id" column="p_board_id" jdbcType="INTEGER"/>-->
+<!--            <result property="board_name" column="board_name" jdbcType="VARCHAR"/>-->
+<!--            <result property="cover" column="cover" jdbcType="VARCHAR"/>-->
+<!--            <result property="board_desc" column="board_desc" jdbcType="VARCHAR"/>-->
+<!--            <result property="sort" column="sort" jdbcType="INTEGER"/>-->
+<!--            <result property="post_type" column="post_type" jdbcType="TINYINT"/>-->
+<!--    </resultMap>-->
+
+<!--    <sql id="Base_Column_List">-->
+<!--        board_id,p_board_id,board_name,-->
+<!--        cover,board_desc,sort,-->
+<!--        post_type-->
+<!--    </sql>-->
+    <select id="getAllBoard" resultType="com.jenfer.pojo.ForumBoard">
+        select board_id, p_board_id, board_name, cover, board_desc, sort, post_type from forum_board
+    </select>
+</mapper>

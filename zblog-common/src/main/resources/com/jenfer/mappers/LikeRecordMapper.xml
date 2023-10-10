@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jenfer.mappers.LikeRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.jenfer.pojo.LikeRecord">
+            <id property="op_id" column="op_id" jdbcType="INTEGER"/>
+            <result property="op_type" column="op_type" jdbcType="TINYINT"/>
+            <result property="object_id" column="object_id" jdbcType="VARCHAR"/>
+            <result property="user_id" column="user_id" jdbcType="VARCHAR"/>
+            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="author_user_id" column="author_user_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        op_id,op_type,object_id,
+        user_id,create_time,author_user_id
+    </sql>
+</mapper>

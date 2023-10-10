@@ -1,0 +1,24 @@
+server:
+  port: 7071
+  servlet:
+    context-path: /api
+#spring:
+#  mail:
+#    host:
+#    port:
+#    username:
+#    password:
+#    default-encoding: UTF-8
+#  datasource:
+#    url: jdbc:mysql://locallhost:3306/zblog?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+#    username: root
+#    password: zjf13760351788
+#    hikari:
+#      pool-name: HikariCPDatasource
+#      minimum-idle: 5
+#      idle-timeout: 180000
+#      maximum-pool-size: 10
+#      auto-commit: true
+#      max-lifetime: 1800000
+#      connection-timeout: 30000
+#      connection-test-query: SELECT 1
