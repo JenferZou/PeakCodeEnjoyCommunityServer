@@ -14,6 +14,9 @@ public class SysSettingCommentDto {
      */
     private Integer commentDayCountThreshold;
 
+    public SysSettingCommentDto() {
+    }
+
     /**
      * 评论是否打开
      */

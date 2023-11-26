@@ -1,8 +1,12 @@
 package com.jenfer.mappers;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jenfer.pojo.ForumArticle;
+import com.jenfer.vo.ForumArticleVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author Jenf
@@ -12,6 +16,9 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
+
+    IPage<ForumArticleVo> queryArticlesWithPagination(Page<ForumArticle> page, @Param("boardId") Integer boardId, @Param("pBoardId") Integer pBoardId, @Param("orderSql") String orderSql);
+
 
 }
 

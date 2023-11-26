@@ -90,7 +90,7 @@ public class AccountController extends ABaseController{
 //            ||StringTools.isEmpty(checkCode)){
 //                throw new BusinessException(ResponseCodeEnum.CODE_600);
 //            }
-            if(!checkCode.equalsIgnoreCase((String)session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))){
+            if(!checkCode.equalsIgnoreCase((String)session.getAttribute(Constants.CHECK_CODE_KEY))){
                 throw new BusinessException("图片验证码错误");
             }
             userInfoService.register(email,emailCode,nickName,password);

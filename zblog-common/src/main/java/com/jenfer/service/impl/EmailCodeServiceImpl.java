@@ -76,7 +76,7 @@ public class EmailCodeServiceImpl extends ServiceImpl<EmailCodeMapper, EmailCode
     @Override
     public void checkCode(String email, String emailCode) {
         QueryWrapper<EmailCode> emailQueryWrapper = new QueryWrapper<>();
-        emailQueryWrapper.eq("email",email).eq("code",emailCode);
+        emailQueryWrapper.eq("email",email).eq("code",emailCode).eq("status",0);
         EmailCode dbEmailCode = baseMapper.selectOne(emailQueryWrapper);
         if(null==dbEmailCode){
             throw new BusinessException("邮箱验证码不正确");

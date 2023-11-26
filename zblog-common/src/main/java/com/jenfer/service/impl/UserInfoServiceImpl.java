@@ -69,9 +69,10 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         if(userInfo!=null){
             throw new BusinessException("邮箱已存在");
         }
-        QueryWrapper<UserInfo> NickNameQueryWrapper = new QueryWrapper<>();
-        emailQueryWrapper.eq("nick_name",nickName);
-         userInfo = baseMapper.selectOne(NickNameQueryWrapper);
+        QueryWrapper<UserInfo> nickNameQueryWrapper = new QueryWrapper<>();
+        nickNameQueryWrapper.eq("nick_name",nickName);
+         userInfo = baseMapper.selectOne(nickNameQueryWrapper);
+
         if(userInfo!=null){
             throw new BusinessException("昵称已存在");
         }
@@ -84,6 +85,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         UserInfo insertInfo = new UserInfo();
         insertInfo.setUser_id(userID);
         insertInfo.setEmail(email);
+        insertInfo.setPassword(StringTools.encodeMd5(password));
         insertInfo.setJoin_time(new Date());
         insertInfo.setNick_name(nickName);
         insertInfo.setStatus(UserStatusEnum.ENABLE.getStatus());

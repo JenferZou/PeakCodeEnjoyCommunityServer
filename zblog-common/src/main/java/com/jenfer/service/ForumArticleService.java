@@ -1,8 +1,12 @@
 package com.jenfer.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumArticle;
+import com.jenfer.vo.ForumArticleVo;
 import com.jenfer.vo.PaginationResultVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface ForumArticleService extends IService<ForumArticle> {
+    IPage<ForumArticleVo> queryArticlesWithPagination(Page<ForumArticle> page,  Integer boardId,  Integer pBoardId, String orderSql);
 
 
 }

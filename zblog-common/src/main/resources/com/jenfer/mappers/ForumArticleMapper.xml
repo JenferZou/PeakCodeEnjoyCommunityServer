@@ -4,39 +4,28 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jenfer.mappers.ForumArticleMapper">
 
-    <resultMap id="BaseResultMap" type="com.jenfer.pojo.ForumArticle">
-            <id property="article_id" column="article_id" jdbcType="VARCHAR"/>
-            <result property="board_id" column="board_id" jdbcType="INTEGER"/>
-            <result property="board_name" column="board_name" jdbcType="VARCHAR"/>
-            <result property="p_board_id" column="p_board_id" jdbcType="INTEGER"/>
-            <result property="p_board_name" column="p_board_name" jdbcType="VARCHAR"/>
-            <result property="user_id" column="user_id" jdbcType="VARCHAR"/>
-            <result property="nick_name" column="nick_name" jdbcType="VARCHAR"/>
-            <result property="user_ip_address" column="user_ip_address" jdbcType="VARCHAR"/>
-            <result property="title" column="title" jdbcType="VARCHAR"/>
-            <result property="cover" column="cover" jdbcType="VARCHAR"/>
-            <result property="content" column="content" jdbcType="VARCHAR"/>
-            <result property="markdown_content" column="markdown_content" jdbcType="VARCHAR"/>
-            <result property="editor_type" column="editor_type" jdbcType="TINYINT"/>
-            <result property="summary" column="summary" jdbcType="VARCHAR"/>
-            <result property="post_time" column="post_time" jdbcType="TIMESTAMP"/>
-            <result property="last_update_time" column="last_update_time" jdbcType="TIMESTAMP"/>
-            <result property="read_count" column="read_count" jdbcType="INTEGER"/>
-            <result property="good_count" column="good_count" jdbcType="INTEGER"/>
-            <result property="comment_count" column="comment_count" jdbcType="INTEGER"/>
-            <result property="top_type" column="top_type" jdbcType="TINYINT"/>
-            <result property="attachment_type" column="attachment_type" jdbcType="TINYINT"/>
-            <result property="status" column="status" jdbcType="TINYINT"/>
-    </resultMap>
+    <select id="queryArticlesWithPagination" resultType="com.jenfer.vo.ForumArticleVo">
+        select article_id,board_id,board_name,p_board_id
+        ,p_board_name,user_id,nick_name,user_ip_address,title,
+         cover,summary,post_time,last_update_time,read_count,
+        good_count,comment_count,top_type,attachment_type,status
+        from forum_article
+        <where>
+        <!-- 板块ID查询条件 -->
+        <if test="boardId != null">
+            AND board_id = #{boardId}
+        </if>
+        <!-- 父板块ID查询条件 -->
+        <if test="pBoardId != null">
+            AND p_board_id = #{pBoardId}
+        </if>
+            AND status = 1
 
-    <sql id="Base_Column_List">
-        article_id,board_id,board_name,
-        p_board_id,p_board_name,user_id,
-        nick_name,user_ip_address,title,
-        cover,content,markdown_content,
-        editor_type,summary,post_time,
-        last_update_time,read_count,good_count,
-        comment_count,top_type,attachment_type,
-        status
-    </sql>
+        <!-- 其他查询条件可以继续添加 -->
+    </where>
+
+        ORDER BY ${orderSql}
+
+
+    </select>
 </mapper>

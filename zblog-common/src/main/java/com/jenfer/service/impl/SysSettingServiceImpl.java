@@ -41,7 +41,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
                 }
                 String code = sysSetting.getCode();
                 SysSettingCodeEnum sysSettingCodeEnum = SysSettingCodeEnum.getByCode(code);
-                PropertyDescriptor pd = new PropertyDescriptor(sysSettingCodeEnum.getPropName(),SysSetting.class);
+                PropertyDescriptor pd = new PropertyDescriptor(sysSettingCodeEnum.getPropName(),SysSettingDto.class);
                 Method writeMethod = pd.getWriteMethod();
                 Class subClazz = Class.forName(sysSettingCodeEnum.getClazz());
                 writeMethod.invoke(sysSettingDto, JsonUtils.convertJson2Obj(jsonContent,subClazz));

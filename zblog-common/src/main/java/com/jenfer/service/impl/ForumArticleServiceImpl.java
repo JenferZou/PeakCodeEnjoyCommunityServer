@@ -1,9 +1,12 @@
 package com.jenfer.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jenfer.mappers.ForumArticleMapper;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.service.ForumArticleService;
+import com.jenfer.vo.ForumArticleVo;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +18,11 @@ import org.springframework.stereotype.Service;
 public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, ForumArticle>
     implements ForumArticleService {
 
+    @Override
+    public IPage<ForumArticleVo> queryArticlesWithPagination(Page<ForumArticle> page, Integer boardId, Integer pBoardId, String orderSql) {
+        return baseMapper.queryArticlesWithPagination(page, boardId, pBoardId, orderSql);
+
+    }
 }
 
 

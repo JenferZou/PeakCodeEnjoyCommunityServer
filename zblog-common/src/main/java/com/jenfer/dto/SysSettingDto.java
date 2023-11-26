@@ -12,6 +12,14 @@ public class SysSettingDto {
 
     private SysSettingLikeDto sysSettingLikeDto;
 
+    public SysSettingCommentDto getSysSettingCommentDto() {
+        return sysSettingCommentDto;
+    }
+
+    public void setSysSettingCommentDto(SysSettingCommentDto sysSettingCommentDto) {
+        this.sysSettingCommentDto = sysSettingCommentDto;
+    }
+
     private SysSettingPostDto sysSettingPostDto;
 
     public SysSettingCommentDto getSysSettingCommenDto() {
