@@ -19,6 +19,8 @@ public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
 
     IPage<ForumArticleVo> queryArticlesWithPagination(Page<ForumArticle> page, @Param("boardId") Integer boardId, @Param("pBoardId") Integer pBoardId, @Param("orderSql") String orderSql);
 
+    void updateArticleCount(@Param("updateType")Integer updateType,@Param("changeCount")Integer changeCount,
+                            @Param("articleId")String articleId);
 
 }
 

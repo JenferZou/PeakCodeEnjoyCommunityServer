@@ -1,6 +1,7 @@
 package com.jenfer.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jenfer.enums.OperRecordOpTypeEnum;
 import com.jenfer.pojo.LikeRecord;
 import org.springframework.stereotype.Service;
 
@@ -11,5 +12,9 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface LikeRecordService extends IService<LikeRecord> {
+
+    void doLike(String objectId, String userId, String nickName, OperRecordOpTypeEnum opType);
+
+
 
 }

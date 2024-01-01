@@ -2,10 +2,13 @@ package com.jenfer.aspect;
 
 import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
+import com.jenfer.constants.Constants;
 import com.jenfer.enums.ResponseCodeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.utils.StringTools;
 import com.jenfer.utils.VerifyUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.reflection.ArrayUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,6 +19,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -70,6 +76,18 @@ public class OperactionAspect {
             logger.error("全局拦截器异常",e);
             throw new BusinessException(ResponseCodeEnum.CODE_500);
         }
+    }
+
+    private void checkLogin(){
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(Constants.SESSION_KEY);
+        if(obj==null){
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
+
+
     }
 
 

@@ -18,5 +18,6 @@ import org.springframework.stereotype.Service;
 public interface ForumArticleService extends IService<ForumArticle> {
     IPage<ForumArticleVo> queryArticlesWithPagination(Page<ForumArticle> page,  Integer boardId,  Integer pBoardId, String orderSql);
 
+    ForumArticle readArticle(String articleId);
 
 }

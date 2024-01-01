@@ -1,6 +1,7 @@
 package com.jenfer.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.pojo.ForumArticleAttachment;
 import org.springframework.stereotype.Service;
 
@@ -12,4 +13,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ForumArticleAttachmentService extends IService<ForumArticleAttachment> {
 
+    ForumArticleAttachment downloadAttachment(String fileId, SessionWebUserDto userInfoFromSession);
 }

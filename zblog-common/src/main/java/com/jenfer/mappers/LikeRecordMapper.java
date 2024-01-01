@@ -3,6 +3,7 @@ package com.jenfer.mappers;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jenfer.pojo.LikeRecord;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author Jenf

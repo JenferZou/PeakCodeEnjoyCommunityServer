@@ -11,7 +11,10 @@ public enum ResponseCodeEnum {
 
     CODE_500(500,"服务器返回错误，请联系管理员"),
 
-    CODE_900(900,"请求超时");
+    CODE_900(900,"请求超时"),
+
+    CODE_901(901,"登陆超时");
+
 
     private Integer code;
 

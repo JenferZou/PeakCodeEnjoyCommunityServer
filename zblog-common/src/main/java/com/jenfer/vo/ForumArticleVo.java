@@ -16,7 +16,7 @@ public class ForumArticleVo {
     private String board_name;
 
 
-    private String p_board_id;
+    private Integer p_board_id;
 
 
     private String p_board_name;
@@ -43,7 +43,7 @@ public class ForumArticleVo {
     private Integer read_count;
 
 
-    private Integer good_cound;
+    private Integer good_count;
 
     private Integer comment_count;
 
@@ -51,12 +51,28 @@ public class ForumArticleVo {
 
     private Integer attachment_type;
 
+    public Integer getP_board_id() {
+        return p_board_id;
+    }
+
+    public void setP_board_id(Integer p_board_id) {
+        this.p_board_id = p_board_id;
+    }
+
+    public Integer getGood_count() {
+        return good_count;
+    }
+
+    public void setGood_count(Integer good_count) {
+        this.good_count = good_count;
+    }
+
     private Integer status;
 
     public ForumArticleVo() {
     }
 
-    public ForumArticleVo(String article_id, Integer board_id, String board_name, String p_board_id, String p_board_name, String user_id, String nick_name, String user_ip_address, String title, String cover, String content, String summary, Date post_time, Integer read_count, Integer good_cound, Integer comment_count, Integer top_type, Integer attachment_type, Integer status) {
+    public ForumArticleVo(String article_id, Integer board_id, String board_name, Integer p_board_id, String p_board_name, String user_id, String nick_name, String user_ip_address, String title, String cover, String content, String summary, Date post_time, Integer read_count, Integer good_count, Integer comment_count, Integer top_type, Integer attachment_type, Integer status) {
         this.article_id = article_id;
         this.board_id = board_id;
         this.board_name = board_name;
@@ -71,7 +87,7 @@ public class ForumArticleVo {
         this.summary = summary;
         this.post_time = post_time;
         this.read_count = read_count;
-        this.good_cound = good_cound;
+        this.good_count = good_count;
         this.comment_count = comment_count;
         this.top_type = top_type;
         this.attachment_type = attachment_type;
@@ -102,13 +118,7 @@ public class ForumArticleVo {
         this.board_name = board_name;
     }
 
-    public String getP_board_id() {
-        return p_board_id;
-    }
 
-    public void setP_board_id(String p_board_id) {
-        this.p_board_id = p_board_id;
-    }
 
     public String getP_board_name() {
         return p_board_name;
@@ -189,14 +199,7 @@ public class ForumArticleVo {
     public void setRead_count(Integer read_count) {
         this.read_count = read_count;
     }
-
-    public Integer getGood_cound() {
-        return good_cound;
-    }
-
-    public void setGood_cound(Integer good_cound) {
-        this.good_cound = good_cound;
-    }
+    
 
     public Integer getComment_count() {
         return comment_count;
