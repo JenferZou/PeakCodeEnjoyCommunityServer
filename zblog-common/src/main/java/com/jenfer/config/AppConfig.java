@@ -9,6 +9,7 @@ public class AppConfig {
     @Value("${project.folder}")
     private String projectFolder;
 
+
     public String getProjectFolder() {
         return projectFolder;
     }

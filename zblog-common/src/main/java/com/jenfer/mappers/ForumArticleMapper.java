@@ -22,6 +22,8 @@ public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
     void updateArticleCount(@Param("updateType")Integer updateType,@Param("changeCount")Integer changeCount,
                             @Param("articleId")String articleId);
 
+
+
 }
 
 

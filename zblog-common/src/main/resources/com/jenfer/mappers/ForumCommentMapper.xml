@@ -28,4 +28,92 @@
         reply_nick_name,top_type,post_time,
         good_count,status
     </sql>
+
+    <sql id="query_condition">
+        <where>
+            <if test="article_id!= null">
+                AND article_id = #{article_id}
+            </if>
+            <if test="p_comment_id!= null">
+                AND p_comment_id = #{p_comment_id}
+            </if>
+            <if test="comment_id!= null">
+                AND comment_id = #{comment_id}
+            </if>
+            <if test="user_id!= null">
+                AND user_id = #{user_id}
+            </if>
+            <if test="nick_name!= null">
+                AND nick_name = #{nick_name}
+            </if>
+            <if test="reply_user_id!= null">
+                AND reply_user_id = #{reply_user_id}
+            </if>
+            <if test="reply_nick_name!= null">
+                AND reply_nick_name = #{reply_nick_name}
+            </if>
+            <if test="top_type!= null">
+                AND top_type = #{top_type}
+            </if>
+            <if test="status!= null">
+                AND status = #{status}
+            </if>
+            <if test="post_time!= null">
+                AND post_time = #{post_time}
+            </if>
+            <if test="good_count!= null">
+                AND good_count = #{good_count}
+            </if>
+            <if test="content!= null">
+                AND content like concat('%',#{content},'%')
+            </if>
+            <if test="img_path!= null">
+                AND img_path like concat('%',#{img_path},'%')
+            </if>
+            <if test="user_ip_address!= null">
+                AND user_ip_address like concat('%',#{user_ip_address},'%')
+            </if>
+--             查询待审核的
+            <if test="current_id!=null">
+                and (status=1 or (status=0 and user_id = #{current_id}))
+            </if>
+
+        </where>
+    </sql>
+    <update id="updateCommentGoodCount">
+        update forum_comment set good_count = good_count + #{changeCount} where comment_id = #{objectId}
+    </update>
+
+
+    <select id="querySubCommentbyParam" resultType="com.jenfer.pojo.ForumComment">
+        select ${Base_Column_List}
+        <if test="haveLike!=null and haveLike and current_id!=null">
+        ,(select count(1) from like_record where like_record.object_id = forum_comment.comment_id and like_record.user_id = #{current_id}) likeType
+        </if>
+        from forum_comment
+        <include refid="query_condition"></include>
+        <if test="pid_list!=null and pid_list.size()>0">
+            AND p_comment_id in (<foreach collection="pid_list" item="item" separator=",">#{item}</foreach> )
+        </if>
+        <if test="current_id!=null">
+            AND (status = 1 or user_id = #{current_id})
+        </if>
+        <if test="orderBy!=null">
+            order by ${orderBy}
+        </if>
+    </select>
+    <select id="queryCommentbyParam" resultType="com.jenfer.pojo.ForumComment">
+        select ${Base_Column_List}
+        <if test="haveLike!=null and haveLike and current_id!=null">
+            ,(select count(1) from like_record where like_record.object_id = forum_comment.comment_id and like_record.user_id = #{current_id}) likeType
+        </if>
+        from forum_comment
+        <include refid="query_condition"></include>
+        <if test="current_id!=null">
+            AND (status = 1 or user_id = #{current_id})
+        </if>
+        <if test="orderBy!=null">
+            order by ${orderBy}
+        </if>
+    </select>
 </mapper>

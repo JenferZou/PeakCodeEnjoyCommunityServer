@@ -8,19 +8,22 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jenfer.constants.Constants;
 import com.jenfer.dto.SessionWebUserDto;
+import com.jenfer.enums.MessageStatusEnum;
+import com.jenfer.enums.MessageTypeEnum;
 import com.jenfer.enums.UserIntegralChangeTypeEnum;
 import com.jenfer.enums.UserIntegralOperTypeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.mappers.ForumArticleAttachmentMapper;
-import com.jenfer.pojo.ForumArticleAttachment;
-import com.jenfer.pojo.ForumArticleAttachmentDownload;
-import com.jenfer.pojo.UserInfo;
+import com.jenfer.pojo.*;
 import com.jenfer.service.ForumArticleAttachmentDownloadService;
 import com.jenfer.service.ForumArticleAttachmentService;
 import com.jenfer.service.ForumArticleService;
+import com.jenfer.service.UserMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
 * @author Jenf
@@ -41,6 +44,8 @@ public class ForumArticleAttachmentServiceImpl extends ServiceImpl
     @Autowired
     private ForumArticleService forumArticleService;
 
+    @Autowired
+    private UserMessageService userMessageService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -80,7 +85,7 @@ public class ForumArticleAttachmentServiceImpl extends ServiceImpl
                 eq(ForumArticleAttachment::getFile_id, fileId);
         this.update(lambdaUpdateWrapper);
         //自己上传或者自己下载过了就直接返回
-        if(userInfoFromSession.getUserId().equals(forumArticleAttachment.getUser_id())||download!=null){
+        if(userInfoFromSession.getUserId().equals(forumArticleAttachment.getUser_id())||download!=null||forumArticleAttachment.getIntegral().equals(0)){
             return forumArticleAttachment;
         }
         //不是特殊的情况的话就正常扣除积分
@@ -93,9 +98,23 @@ public class ForumArticleAttachmentServiceImpl extends ServiceImpl
                 UserIntegralChangeTypeEnum.ADD.getChangeType(), forumArticleAttachment.getIntegral());
 
         //记录消息
+        LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumArticle::getArticle_id,forumArticleAttachment.getArticle_id());
+        ForumArticle article = forumArticleService.getOne(queryWrapper);
+        UserMessage userMessage = new UserMessage();
+         userMessage.setArticle_id(article.getArticle_id());
+         userMessage.setArticle_title(article.getTitle());
+         userMessage.setMessage_type(MessageTypeEnum.DOWNLOAD_ATTACHMENT.getType());
+         userMessage.setCreate_time(new Date());
+         userMessage.setSend_nick_name(userInfoFromSession.getNickName());
+         userMessage.setSend_user_id(userInfoFromSession.getUserId());
+         userMessage.setReceived_user_id(forumArticleAttachment.getUser_id());
+         userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
+         userMessage.setComment_id(0);
 
+         userMessageService.save(userMessage);
 
-            return null;
+        return forumArticleAttachment;
     }
 }
 

@@ -1,8 +1,12 @@
 package com.jenfer.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumComment;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author Jenf
@@ -11,5 +15,16 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface ForumCommentService extends IService<ForumComment> {
+
+    public List<ForumComment> queryListByParam(Page<ForumComment> page,
+                                               ForumComment forumComment,
+                                               String orderBy,
+                                               Boolean queryChildren,
+                                               String currentId,
+                                               Boolean haveLike);
+
+
+
+    void changeTopType(String userId,Integer commentId,Integer topType);
 
 }

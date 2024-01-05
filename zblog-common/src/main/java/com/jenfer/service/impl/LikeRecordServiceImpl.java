@@ -11,9 +11,11 @@ import com.jenfer.enums.OperRecordOpTypeEnum;
 import com.jenfer.enums.UpdateArticleTypeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.mappers.ForumArticleMapper;
+import com.jenfer.mappers.ForumCommentMapper;
 import com.jenfer.mappers.LikeRecordMapper;
 import com.jenfer.mappers.UserMessageMapper;
 import com.jenfer.pojo.ForumArticle;
+import com.jenfer.pojo.ForumComment;
 import com.jenfer.pojo.LikeRecord;
 import com.jenfer.pojo.UserMessage;
 import com.jenfer.service.LikeRecordService;
@@ -38,6 +40,9 @@ public class LikeRecordServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRec
     @Autowired
     private ForumArticleMapper forumArticleMapper;
 
+    @Autowired
+    private ForumCommentMapper forumCommentMapper;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -59,6 +64,18 @@ public class LikeRecordServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRec
                 userMessage.setReceived_user_id(forumArticle.getUser_id());
                 break;
             case COMMENT_LIKE:
+                ForumComment forumComment = forumCommentMapper.selectById(Integer.parseInt(objectId));
+                forumArticle = forumArticleMapper.selectOne(new LambdaUpdateWrapper<ForumArticle>().eq(ForumArticle::getArticle_id,forumComment.getArticle_id()));
+                if(null==forumComment){
+                    throw new BusinessException("评论不存在");
+                }
+                commentLike(objectId,forumComment,userId, opType);
+                userMessage.setArticle_id(objectId);
+                userMessage.setArticle_title(forumArticle.getTitle());
+                userMessage.setMessage_type(MessageTypeEnum.COMMENT_LIKE.getType());
+                userMessage.setComment_id(forumComment.getComment_id());
+                userMessage.setReceived_user_id(forumArticle.getUser_id());
+                userMessage.setMessage_content(forumComment.getContent());
                 break;
         }
         userMessage.setSend_user_id(userId);
@@ -109,6 +126,44 @@ public class LikeRecordServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRec
         }
 
     }
+
+
+    public void commentLike(String objectId,ForumComment forumComment,String userId,OperRecordOpTypeEnum opTypeEnum){
+        LambdaQueryWrapper<LikeRecord> likeRecordLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询是否有相关的点赞记录
+         likeRecordLambdaQueryWrapper
+               .eq(LikeRecord::getObject_id, objectId)
+               .eq(LikeRecord::getUser_id, userId)
+               .eq(LikeRecord::getOp_type, opTypeEnum.getType());
+
+        LikeRecord likeRecord = this.getOne(likeRecordLambdaQueryWrapper);
+        if(likeRecord!=null){
+            //如果有对应的点赞记录，那就删除点赞记录也就是取消点赞
+            LambdaQueryWrapper<LikeRecord> likeRecordLambdaDeleteWrapper = new LambdaQueryWrapper<>();
+            likeRecordLambdaDeleteWrapper.eq(LikeRecord::getObject_id, objectId)
+                    .eq(LikeRecord::getUser_id, userId)
+                    .eq(LikeRecord::getOp_type, opTypeEnum.getType());
+            this.remove(likeRecordLambdaDeleteWrapper);
+            forumCommentMapper.updateCommentGoodCount(-1,Integer.parseInt(objectId));
+        }else {
+            //如果有文章的话那就添加点赞记录
+            LikeRecord newlikeRecord = new LikeRecord();
+            newlikeRecord.setObject_id(objectId);
+            newlikeRecord.setUser_id(userId);
+            newlikeRecord.setOp_type(opTypeEnum.getType());
+            newlikeRecord.setAuthor_user_id(forumComment.getUser_id());
+            newlikeRecord.setCreate_time(new Date());
+            this.save(newlikeRecord);
+            forumCommentMapper.updateCommentGoodCount(1,Integer.parseInt(objectId));
+
+        }
+
+           }
+
+
+
+
+
 
 
 

@@ -26,4 +26,9 @@ public class StringTools {
         return StringTools.isEmpty(sourceStr)?null: DigestUtils.md5Hex(sourceStr);
     }
 
+
+    public static String getFileSuffix(String fileName){
+        return fileName.substring(fileName.lastIndexOf("."));
+    }
+
 }
