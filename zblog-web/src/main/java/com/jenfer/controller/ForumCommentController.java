@@ -6,21 +6,20 @@ import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
 import com.jenfer.constants.Constants;
 import com.jenfer.dto.SessionWebUserDto;
-import com.jenfer.enums.ArticleStatusEnum;
-import com.jenfer.enums.OperRecordOpTypeEnum;
-import com.jenfer.enums.PageSize;
-import com.jenfer.enums.ResponseCodeEnum;
+import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.pojo.ForumComment;
 import com.jenfer.pojo.LikeRecord;
 import com.jenfer.service.ForumCommentService;
 import com.jenfer.service.LikeRecordService;
+import com.jenfer.utils.StringTools;
 import com.jenfer.utils.SysCacheUtils;
 import com.jenfer.vo.ResponseVo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -108,5 +107,47 @@ public class ForumCommentController extends ABaseController{
 
     }
 
+
+    @RequestMapping("/postComment")
+    @GloballInterceptor(checkLogin = true,checkParams = true)
+    public ResponseVo postComment (HttpSession session, @VerifyParam(required = true)String articleId,
+                                   @VerifyParam(required = true) Integer pCommentId,
+                                   @VerifyParam(min = 5,max = 800) String content,
+                                   MultipartFile image,String replyUserId){
+
+        //未开启评论功能
+        if(!SysCacheUtils.getSysSetting().getSysSettingCommenDto().getCommentOpen()){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if(image==null&& StringTools.isEmpty(content)){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+
+        ForumComment forumComment = new ForumComment();
+        content = StringTools.transPageHtml(content);
+        forumComment.setUser_id(userDto.getUserId());
+        forumComment.setNick_name(userDto.getNickName());
+        forumComment.setUser_ip_address(userDto.getProvince());
+        forumComment.setP_comment_id(pCommentId);
+        forumComment.setArticle_id(articleId);
+        forumComment.setContent(content);
+        forumComment.setReply_user_id(replyUserId);
+        forumComment.setTop_type(CommentTopTypeEnum.NO_TOP.getType());
+
+        forumCommentService.postComment(forumComment,image);
+        if(pCommentId!=0){
+            ForumComment queryComment = new ForumComment();
+            queryComment.setArticle_id(articleId);
+            queryComment.setP_comment_id(pCommentId);
+            String orderType = "comment_id asc";
+            List<ForumComment> commentList = forumCommentService.queryListByParam(null, queryComment, orderType, true, null, false);
+            return getSuccessResponseVo(commentList);
+        }
+
+        return getSuccessResponseVo(forumComment);
+
+
+    }
 
 }

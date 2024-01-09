@@ -5,20 +5,32 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jenfer.enums.CommentTopTypeEnum;
-import com.jenfer.enums.ResponseCodeEnum;
+import com.jenfer.constants.Constants;
+import com.jenfer.dto.FileUploadDto;
+import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.mappers.ForumArticleMapper;
 import com.jenfer.mappers.ForumCommentMapper;
+import com.jenfer.mappers.UserInfoMapper;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumComment;
+import com.jenfer.pojo.UserInfo;
+import com.jenfer.pojo.UserMessage;
 import com.jenfer.service.ForumCommentService;
+import com.jenfer.service.UserInfoService;
+import com.jenfer.service.UserMessageService;
+import com.jenfer.utils.FileUtils;
+import com.jenfer.utils.StringTools;
+import com.jenfer.utils.SysCacheUtils;
+import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +47,18 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
 
     @Autowired
     private ForumArticleMapper forumArticleMapper;
+
+
+    @Resource
+    private UserInfoService userInfoService;
+
+    @Resource
+    private UserMessageService userMessageService;
+
+
+
+    @Resource
+    private FileUtils fileUtils;
     @Override
     public List<ForumComment> queryListByParam(Page<ForumComment> page,
                                                ForumComment forumComment,
@@ -102,6 +126,91 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
 
 
     }
+
+    @Override
+    public void postComment(ForumComment forumComment, MultipartFile image) {
+        LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumArticle::getArticle_id,forumComment.getArticle_id());
+        ForumArticle forumArticle = forumArticleMapper.selectOne(queryWrapper);
+        if(forumArticle==null ||!ArticleStatusEnum.AUDIT.getStatus().equals(forumArticle.getStatus())){
+            throw new BusinessException("评论文章不存在");
+        }
+        ForumComment pComment = null;
+        if (forumComment.getP_comment_id()!=0){
+            LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(ForumComment::getP_comment_id,forumComment.getP_comment_id());
+            pComment = this.baseMapper.selectOne(wrapper);
+            if (pComment==null){
+                throw new BusinessException("回复评论不存在");
+            }
+        }
+        //判断回复的用户是否存在
+        if(!StringTools.isEmpty(forumComment.getReply_nick_name())){
+            LambdaQueryWrapper<UserInfo> userInfoQuery = new LambdaQueryWrapper<>();
+            userInfoQuery.eq(UserInfo::getUser_id,forumComment.getReply_user_id());
+            UserInfo userInfo = userInfoService.getOne(userInfoQuery);
+            if(userInfo==null){
+                throw new BusinessException("回复用户不存在");
+            }
+            forumComment.setReply_nick_name(userInfo.getNick_name());
+
+        }
+        forumComment.setPost_time(new Date());
+        if(image!=null){
+            FileUploadDto fileUploadDto = fileUtils.uploadFile2Local(image, Constants.FILE_FOLDER_IMAGE, FileUploadTypeEnum.COMMEMT_IMAGE);
+            forumComment.setImg_path(fileUploadDto.getLocalPath());
+        }
+        Boolean needAudit = SysCacheUtils.getSysSetting().getSysSettingAuditDto().getCommentAudit();
+        forumComment.setStatus(needAudit? CommentStatusEnum.NO_AUDIT.getStatus() : CommentStatusEnum.AUDIT.getStatus());
+        this.baseMapper.insert(forumComment);
+        if(needAudit){
+            return;
+        }
+
+        updateCommentInfo(forumComment,forumArticle,pComment);
+
+
+    }
+
+
+    public void updateCommentInfo(ForumComment forumComment,ForumArticle forumArticle,ForumComment pComment){
+        Integer commengIntegral = SysCacheUtils.getSysSetting().getSysSettingCommentDto().getCommentIntegral();
+        if(commengIntegral!=null&&commengIntegral>0){
+           userInfoService.updateUserIntegral(forumComment.getUser_id(), UserIntegralOperTypeEnum.POST_COMMENT,
+                   UserIntegralChangeTypeEnum.ADD.getChangeType(), commengIntegral);
+        }
+        if(forumComment.getP_comment_id()==0){
+            forumArticleMapper.updateArticleCount(UpdateArticleTypeEnum.COMMENT_COUNT.getType(), Constants.ONE,forumComment.getArticle_id());
+        }
+
+        //记录消息
+        UserMessage userMessage = new UserMessage();
+        userMessage.setMessage_type(MessageTypeEnum.COMMENT.getType());
+        userMessage.setCreate_time(new Date());
+        userMessage.setArticle_id(forumComment.getArticle_id());
+        userMessage.setArticle_title(forumArticle.getTitle());
+        userMessage.setComment_id(forumComment.getComment_id());
+        userMessage.setSend_user_id(forumComment.getUser_id());
+        userMessage.setSend_nick_name(forumComment.getNick_name());
+        userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
+        //当前评论的是文章的作者
+        if(forumComment.getP_comment_id()==0){
+            userMessage.setReceived_user_id(forumArticle.getUser_id());
+        } else if (forumComment.getP_comment_id()!=0&&StringTools.isEmpty(forumComment.getReply_user_id())) {
+            //回复的当前二级评论跟一级评论是同一个人
+            userMessage.setReceived_user_id(pComment.getUser_id());
+        } else if (forumComment.getP_comment_id()!=0&&StringTools.isEmpty(forumComment.getReply_user_id())){
+            //回复的当前二级评论跟一级评论不是同一个人
+            userMessage.setReceived_user_id(forumComment.getReply_user_id());
+        }
+        if(!forumComment.getUser_id().equals(userMessage.getReceived_user_id())){
+            userMessageService.save(userMessage);
+        }
+
+
+    }
+
+
 }
 
 

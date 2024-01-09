@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumArticle;
+import com.jenfer.pojo.ForumArticleAttachment;
 import com.jenfer.vo.ForumArticleVo;
 import com.jenfer.vo.PaginationResultVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author Jenf
@@ -20,4 +22,7 @@ public interface ForumArticleService extends IService<ForumArticle> {
 
     ForumArticle readArticle(String articleId);
 
+    void postArticle(Boolean isAdmin,ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover,MultipartFile attachment);
+
+    void updateArticle(Boolean isAdmin,ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover,MultipartFile attachment);
 }

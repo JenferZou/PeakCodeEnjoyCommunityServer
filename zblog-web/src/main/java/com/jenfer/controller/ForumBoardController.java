@@ -15,7 +15,7 @@ public class ForumBoardController extends ABaseController {
 
     @RequestMapping("/loadBoard")
     public ResponseVo loadBoard(){
-        return getSuccessResponseVo(forumBoardService.getBoardTree());
+        return getSuccessResponseVo(forumBoardService.getBoardTree(null));
     }
 
 

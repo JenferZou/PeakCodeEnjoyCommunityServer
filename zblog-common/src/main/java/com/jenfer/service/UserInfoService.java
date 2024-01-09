@@ -6,6 +6,7 @@ import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.enums.UserIntegralOperTypeEnum;
 import com.jenfer.pojo.UserInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author Jenf
@@ -22,5 +23,9 @@ public interface UserInfoService extends IService<UserInfo> {
 
 
     void resetPwd(String email,String password,String emailCode);
+
+    void updateUserInfo(UserInfo userInfo, MultipartFile avatar);
+
+
 
 }

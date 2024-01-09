@@ -155,6 +155,19 @@ public class ForumArticle implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
+
+
+
+
+    //extend4query
+
+    @TableField(exist = false)
+    private String like_user_id;
+
+    @TableField(exist = false)
+    private String comment_user_id;
+
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {

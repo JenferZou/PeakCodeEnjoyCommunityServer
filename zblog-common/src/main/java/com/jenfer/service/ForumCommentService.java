@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumComment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,5 +27,7 @@ public interface ForumCommentService extends IService<ForumComment> {
 
 
     void changeTopType(String userId,Integer commentId,Integer topType);
+
+    void postComment(ForumComment forumComment, MultipartFile image);
 
 }

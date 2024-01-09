@@ -33,6 +33,8 @@ public class ForumArticleVo {
 
     private String content;
 
+    private String markdown_content;
+
     private String summary;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
@@ -50,6 +52,8 @@ public class ForumArticleVo {
     private Integer top_type;
 
     private Integer attachment_type;
+
+    private Integer editor_type;
 
     public Integer getP_board_id() {
         return p_board_id;
@@ -72,26 +76,21 @@ public class ForumArticleVo {
     public ForumArticleVo() {
     }
 
-    public ForumArticleVo(String article_id, Integer board_id, String board_name, Integer p_board_id, String p_board_name, String user_id, String nick_name, String user_ip_address, String title, String cover, String content, String summary, Date post_time, Integer read_count, Integer good_count, Integer comment_count, Integer top_type, Integer attachment_type, Integer status) {
-        this.article_id = article_id;
-        this.board_id = board_id;
-        this.board_name = board_name;
-        this.p_board_id = p_board_id;
-        this.p_board_name = p_board_name;
-        this.user_id = user_id;
-        this.nick_name = nick_name;
-        this.user_ip_address = user_ip_address;
-        this.title = title;
-        this.cover = cover;
-        this.content = content;
-        this.summary = summary;
-        this.post_time = post_time;
-        this.read_count = read_count;
-        this.good_count = good_count;
-        this.comment_count = comment_count;
-        this.top_type = top_type;
-        this.attachment_type = attachment_type;
-        this.status = status;
+
+    public String getMarkdown_content() {
+        return markdown_content;
+    }
+
+    public void setMarkdown_content(String markdown_content) {
+        this.markdown_content = markdown_content;
+    }
+
+    public Integer getEditor_type() {
+        return editor_type;
+    }
+
+    public void setEditor_type(Integer editor_type) {
+        this.editor_type = editor_type;
     }
 
     public String getArticle_id() {

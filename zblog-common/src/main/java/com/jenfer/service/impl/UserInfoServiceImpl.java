@@ -18,10 +18,7 @@ import com.jenfer.pojo.UserMessage;
 import com.jenfer.service.EmailCodeService;
 import com.jenfer.service.UserInfoService;
 import com.jenfer.service.UserIntegralRecordService;
-import com.jenfer.utils.JsonUtils;
-import com.jenfer.utils.OKHttpUtils;
-import com.jenfer.utils.StringTools;
-import com.jenfer.utils.SysCacheUtils;
+import com.jenfer.utils.*;
 import org.apache.catalina.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -29,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.crypto.Data;
 import java.util.Date;
@@ -55,6 +53,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Autowired
     private UserIntegralRecordMapper userIntegralRecordMapper;
+
+    @Autowired
+    private FileUtils fileUtils;
 
 
     @Autowired
@@ -188,6 +189,12 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     }
 
+    @Override
+    public void updateUserInfo(UserInfo userInfo, MultipartFile avatar) {
+        this.baseMapper.update(userInfo,new LambdaUpdateWrapper<UserInfo>().eq(UserInfo::getUser_id,userInfo.getUser_id()));
+
+    }
+
 
     public String getIpAddress(String ip){
         Map<String, String> addressInfo = new HashMap<>();
@@ -203,6 +210,13 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         }
         return Constants.NO_ADDRESS;
     }
+
+
+
+
+
+
+
 
 }
 

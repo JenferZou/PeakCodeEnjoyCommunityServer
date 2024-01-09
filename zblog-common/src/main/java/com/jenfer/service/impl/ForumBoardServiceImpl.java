@@ -21,9 +21,13 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
     implements ForumBoardService {
 
     @Override
-    public List<ForumBoard> getBoardTree() {
-//        List<ForumBoard> forumBoards = baseMapper.selectList(new LambdaQueryWrapper<ForumBoard>().eq(ForumBoard::getPost_type,1));
-        List<ForumBoard> forumBoards = baseMapper.selectList(null);
+    public List<ForumBoard> getBoardTree(Integer postType) {
+        List<ForumBoard> forumBoards = null;
+        if(postType!=null){
+            forumBoards = baseMapper.selectList(new LambdaQueryWrapper<ForumBoard>().eq(ForumBoard::getPost_type,postType));
+        }else {
+            forumBoards = baseMapper.selectList(null);
+        }
         return convertLine2Tree(forumBoards,0);
     }
 

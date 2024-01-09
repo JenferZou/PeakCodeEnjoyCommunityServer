@@ -3,7 +3,7 @@ package com.jenfer.enums;
 public enum UpdateArticleTypeEnum {
     READ_COUNT(0,"阅读数"),
     GOOD_COUNT(1,"点赞数"),
-    COMMENT(2,"评论数");
+    COMMENT_COUNT(2,"评论数");
 
     private Integer type;
     private String desc;

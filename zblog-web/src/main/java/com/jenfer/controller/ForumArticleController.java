@@ -15,6 +15,7 @@ import com.jenfer.exception.BusinessException;
 import com.jenfer.pojo.*;
 import com.jenfer.service.*;
 import com.jenfer.utils.CopyTools;
+import com.jenfer.utils.StringTools;
 import com.jenfer.vo.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -50,6 +52,9 @@ public class ForumArticleController extends ABaseController {
 
     @Autowired
     private ForumArticleAttachmentDownloadService forumArticleAttachmentDownloadService;
+
+    @Autowired
+    private ForumBoardService forumBoardService;
 
     @Resource
     private WebConfig webConfig;
@@ -207,6 +212,127 @@ public class ForumArticleController extends ABaseController {
         }
 
     }
+
+
+
+
+    @RequestMapping("/loadBoard4Post")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo loadBoard4Post (HttpSession session){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+        Integer postType = Constants.ZERO;
+        if(!userDto.getAdmin()){
+            postType = Constants.ONE;
+        }
+        return getSuccessResponseVo(forumBoardService.getBoardTree(postType));
+    }
+
+
+    @RequestMapping("/postArticle")
+    @GloballInterceptor(checkParams = true,checkLogin = true)
+    public ResponseVo postArticle (HttpSession session,
+                                   MultipartFile cover,
+                                   MultipartFile attachment,
+                                   Integer integral,
+                                   Integer boardId,
+                                   String markdownContent,
+                                   @VerifyParam(max = 200) String summary,
+                                   @VerifyParam(required = true)String content,
+                                   @VerifyParam(required = true)Integer editorType,
+                                   @VerifyParam(required = true,max = 150)String title,
+                                   @VerifyParam(required = true)Integer pBoardId){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+       title = StringTools.transPageHtml(title);
+        ForumArticle forumArticle = new ForumArticle();
+        forumArticle.setP_board_id(pBoardId);
+        forumArticle.setBoard_id(boardId);
+        forumArticle.setTitle(title);
+        forumArticle.setContent(content);
+        EditTypeEnum byType = EditTypeEnum.getByType(editorType);
+        if(byType==null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if(EditTypeEnum.MARKDOWN.getType().equals(editorType)&&StringTools.isEmpty(markdownContent)){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        forumArticle.setMarkdown_content(markdownContent);
+        forumArticle.setEditor_type(editorType);
+        forumArticle.setUser_id(userDto.getUserId());
+        forumArticle.setNick_name(userDto.getNickName());
+        forumArticle.setUser_ip_address(userDto.getProvince());
+        forumArticle.setSummary(summary);
+
+        //附件信息
+        ForumArticleAttachment forumArticleAttachment = new ForumArticleAttachment();
+        forumArticleAttachment.setIntegral(integral==null?0:integral);
+        forumArticleService.postArticle(userDto.getAdmin(),forumArticle,forumArticleAttachment,cover,attachment);
+
+        return getSuccessResponseVo(forumArticle.getArticle_id());
+    }
+
+
+
+    @RequestMapping("/articleDetail4Update")
+    @GloballInterceptor(checkParams = true,checkLogin = true)
+    public ResponseVo postArticle (HttpSession session,
+                                   @VerifyParam(required = true)String articleId){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+        ForumArticle forumArticle = forumArticleService.getById(articleId);
+        if(forumArticle==null||!userDto.getUserId().equals(forumArticle.getUser_id())){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        ForumArticleDetailVo forumArticleDetailVo = new ForumArticleDetailVo();
+        forumArticleDetailVo.setForumArticleVo(CopyTools.copy(forumArticle, ForumArticleVo.class));
+        if(forumArticle.getAttachment_type()== Constants.ONE){
+            LambdaQueryWrapper<ForumArticleAttachment> forumArticleAttachmentLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            forumArticleAttachmentLambdaQueryWrapper.eq(ForumArticleAttachment::getArticle_id, articleId);
+            List<ForumArticleAttachment> forumArticleAttachmentlist = forumArticleAttachmentService.list(forumArticleAttachmentLambdaQueryWrapper);
+            if(!forumArticleAttachmentlist.isEmpty()){
+                forumArticleDetailVo.setForumArticleAttachmentVo(CopyTools.copy(forumArticleAttachmentlist.get(0), ForumArticleAttachmentVo.class));
+            }
+        }
+        return getSuccessResponseVo(forumArticleDetailVo);
+    }
+
+
+    @RequestMapping("/updateArticle")
+    @GloballInterceptor(checkParams = true,checkLogin = true)
+    public ResponseVo updateArticle (HttpSession session,
+                                   MultipartFile cover,
+                                   MultipartFile attachment,
+                                   Integer integral,
+                                   Integer boardId,
+                                   String markdownContent,
+                                   @VerifyParam(required = true) Integer attachmentType,
+                                   @VerifyParam(required = true,max = 150)String articleId,
+                                   @VerifyParam(max = 200) String summary,
+                                   @VerifyParam(required = true)String content,
+                                   @VerifyParam(required = true)Integer editorType,
+                                   @VerifyParam(required = true,max = 150)String title,
+                                   @VerifyParam(required = true)Integer pBoardId){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+        title = StringTools.transPageHtml(title);
+        ForumArticle forumArticle = new ForumArticle();
+        forumArticle.setP_board_id(pBoardId);
+        forumArticle.setBoard_id(boardId);
+        forumArticle.setTitle(title);
+        forumArticle.setContent(content);
+        forumArticle.setMarkdown_content(markdownContent);
+        forumArticle.setEditor_type(editorType);
+        forumArticle.setSummary(summary);
+        forumArticle.setUser_ip_address(userDto.getProvince());
+        EditTypeEnum byType = EditTypeEnum.getByType(editorType);
+        forumArticle.setUser_id(userDto.getUserId());
+        forumArticle.setNick_name(userDto.getNickName());
+        forumArticle.setAttachment_type(attachmentType);
+
+        //附件信息
+        ForumArticleAttachment forumArticleAttachment = new ForumArticleAttachment();
+        forumArticleAttachment.setIntegral(integral==null?0:integral);
+        forumArticleService.updateArticle(userDto.getAdmin(),forumArticle,forumArticleAttachment,cover,attachment);
+        return getSuccessResponseVo(forumArticle.getArticle_id());
+    }
+
 
 
 

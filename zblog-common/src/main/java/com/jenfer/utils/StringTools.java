@@ -31,4 +31,18 @@ public class StringTools {
         return fileName.substring(fileName.lastIndexOf("."));
     }
 
+    public static String getFileName(String fileName){
+        return fileName.substring(0,fileName.lastIndexOf("."));
+    }
+
+
+    public static String transPageHtml(String content){
+        if(StringTools.isEmpty(content)){
+            return content;
+        }
+        content.replace("<", "&lt;");
+        content.replace(" ", "&nbsp;");
+        content.replace("\n", "<br/>");
+        return content;
+    }
 }

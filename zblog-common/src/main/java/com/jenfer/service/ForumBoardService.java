@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public interface ForumBoardService extends IService<ForumBoard> {
 
-    List<ForumBoard> getBoardTree();
+    List<ForumBoard> getBoardTree(Integer postType);
 
 
 }
