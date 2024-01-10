@@ -23,6 +23,9 @@ public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
                             @Param("articleId")String articleId);
 
 
+    IPage<ForumArticleVo> queryArticleBySort(Page<ForumArticle> page,ForumArticle forumArticle);
+
+
 
 }
 

@@ -1,6 +1,7 @@
 package com.jenfer.service;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.enums.UserIntegralOperTypeEnum;

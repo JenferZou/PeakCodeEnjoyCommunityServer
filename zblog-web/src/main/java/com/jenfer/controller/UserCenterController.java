@@ -81,9 +81,13 @@ public class UserCenterController extends ABaseController{
        if(type==0){
            forumArticleLambdaQueryWrapper.eq(ForumArticle::getUser_id,userId);
        }else if(type==1){
-           forumArticleLambdaQueryWrapper.eq(ForumArticle::getComment_user_id,userId);
+           //点击就查询自己发过评论的文章
+           forumArticleLambdaQueryWrapper.inSql(ForumArticle::getArticle_id,
+                   "select article_id from forum_comment where user_id = '" + userId + "' and status = 1");
        } else if (type==2) {
-           forumArticleLambdaQueryWrapper.eq(ForumArticle::getLike_user_id,userId);
+           //点击就查询自己点过咱的文章
+           forumArticleLambdaQueryWrapper.inSql(ForumArticle::getArticle_id,
+                   "select article_id from like_record where user_id = '" + userId + "' and op_type = 0 and status = 1");
        }
 
         SessionWebUserDto userDto = getUserInfoFromSession(session);

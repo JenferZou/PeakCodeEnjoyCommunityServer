@@ -19,6 +19,82 @@
         where article_id = #{articleId}
     </update>
 
+    <sql id="query_condition">
+  <where>
+    <if test="article_id!=null">
+        article_id = #{article_id}
+    </if>
+    <if test="board_id != null">
+        AND board_id = #{board_id}
+    </if>
+    <if test="board_name!=null">
+        AND board_name like concat('%',#{board_name},'%')
+    </if>
+    <if test="p_board_id != null">
+        AND p_board_id = #{p_board_id}
+    </if>
+    <if test="p_board_name!= null">
+        AND p_board_name like concat('%',#{p_board_name},'%')
+    </if>
+    <if test="user_ip_address!= null">
+        AND user_ip_address like concat('%',#{user_ip_address},'%')
+    </if>
+    <if test="title!= null">
+        AND title like concat('%',#{title},'%')
+    </if>
+    <if test="summary!= null">
+        AND summary like concat('%',#{summary},'%')
+    </if>
+    <if test="user_id!= null">
+        AND user_id = #{user_id}
+    </if>
+    <if test="nick_name">
+        AND nick_name like concat('%',#{nick_name},'%')
+    </if>
+    <if test="editor_type!= null">
+        AND editor_type = #{editor_type}
+    </if>
+    <if test="read_count!= null">
+        AND read_count = #{read_count}
+    </if>
+    <if test="content">
+        AND content like concat('%',#{content},'%')
+    </if>
+    <if test="good_count!= null">
+        AND good_count = #{good_count}
+    </if>
+    <if test="comment_count!= null">
+        AND comment_count = #{comment_count}
+    </if>
+    <if test="top_type!= null">
+        AND top_type = #{top_type}
+    </if>
+    <if test="attachment_type!= null">
+        AND attachment_type = #{attachment_type}
+    </if>
+    <if test="current_id!=null">
+        AND (status = 1 or (status = 0 and user_id = #{current_id})))
+    </if>
+    <if test="comment_user_id!=null and comment_user_id!=''">
+        AND article_id in (select article_id from forum_comment where user_id = #{comment_user_id})
+        and status = 1
+    </if>
+    <if test="like_user_id!=null and like_user_id!=''">
+        AND article_id in (select article_id from like_record where user_id = #{like_user_id} and op_type=0)
+        and status = 1
+    </if>
+</where>
+    </sql>
+
+    <select id="queryArticleBySort" resultType="com.jenfer.vo.ForumArticleVo">
+        select article_id,board_id,board_name,p_board_id
+       ,p_board_name,user_id,nick_name,user_ip_address,title,
+         cover,summary,post_time,last_update_time,read_count,
+        good_count,comment_count,top_type,attachment_type,status
+        from forum_article
+        <include refid="query_condition"></include>
+    </select>
+
     <select id="queryArticlesWithPagination" resultType="com.jenfer.vo.ForumArticleVo">
         select article_id,board_id,board_name,p_board_id
         ,p_board_name,user_id,nick_name,user_ip_address,title,

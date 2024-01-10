@@ -167,6 +167,8 @@ public class ForumArticle implements Serializable {
     @TableField(exist = false)
     private String comment_user_id;
 
+    @TableField(exist = false)
+    private String current_id;
 
     @Override
     public boolean equals(Object that) {
