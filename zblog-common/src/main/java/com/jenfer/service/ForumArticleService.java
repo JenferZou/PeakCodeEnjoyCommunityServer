@@ -27,7 +27,7 @@ public interface ForumArticleService extends IService<ForumArticle> {
     void updateArticle(Boolean isAdmin,ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover,MultipartFile attachment);
 
 
-    IPage<ForumArticleVo> queryArticleBySort(Page<ForumArticle> page,ForumArticle forumArticle);
+
 
 
 
