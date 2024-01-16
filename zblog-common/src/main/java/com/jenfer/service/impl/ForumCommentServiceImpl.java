@@ -138,7 +138,7 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
         ForumComment pComment = null;
         if (forumComment.getP_comment_id()!=0){
             LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(ForumComment::getP_comment_id,forumComment.getP_comment_id());
+            wrapper.eq(ForumComment::getComment_id,forumComment.getP_comment_id());
             pComment = this.baseMapper.selectOne(wrapper);
             if (pComment==null){
                 throw new BusinessException("回复评论不存在");

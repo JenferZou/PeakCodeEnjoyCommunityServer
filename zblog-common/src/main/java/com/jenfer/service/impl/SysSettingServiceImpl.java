@@ -45,8 +45,6 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
                 Method writeMethod = pd.getWriteMethod();
                 Class subClazz = Class.forName(sysSettingCodeEnum.getClazz());
                 writeMethod.invoke(sysSettingDto, JsonUtils.convertJson2Obj(jsonContent,subClazz));
-
-
             }
             SysCacheUtils.refresh(sysSettingDto);
 

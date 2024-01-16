@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.jenfer.enums.UserIntegralOperTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,6 +53,20 @@ public class UserIntegralRecord implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+
+    @TableField(exist = false)
+    private String operTypeName;
+
+
+    public String getOperTypeName() {
+        UserIntegralOperTypeEnum operTypeEnum = UserIntegralOperTypeEnum.getOperType(this.oper_type);
+        return operTypeEnum.getDesc();
+    }
+
+    public void setOperTypeName(String operTypeName) {
+        this.operTypeName = operTypeName;
+    }
 
     @Override
     public boolean equals(Object that) {

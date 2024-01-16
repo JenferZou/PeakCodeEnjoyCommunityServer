@@ -8,12 +8,14 @@ import com.jenfer.constants.Constants;
 import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
+import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumComment;
 import com.jenfer.pojo.LikeRecord;
 import com.jenfer.service.ForumCommentService;
 import com.jenfer.service.LikeRecordService;
 import com.jenfer.utils.StringTools;
 import com.jenfer.utils.SysCacheUtils;
+import com.jenfer.vo.PaginationResultVo;
 import com.jenfer.vo.ResponseVo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,14 +71,16 @@ public class ForumCommentController extends ABaseController{
         Page<ForumComment> forumCommentPage = new Page<>(pageNo==null?1:pageNo, PageSize.SIZE50.getSize());
         forumComment.setP_comment_id(0);
         List<ForumComment> forumCommentList = forumCommentService.queryListByParam(forumCommentPage, forumComment, orderBy, queryChildren, currentId, queryHaveLike);
-
-        return getSuccessResponseVo(forumCommentList);
+        PaginationResultVo<ForumComment> resultVo = new PaginationResultVo<>();
+        resultVo.setList(forumCommentList);
+        resultVo.setPageNo(pageNo);
+        return  getSuccessResponseVo(convert2PaginationVo(resultVo,ForumComment.class));
 
     }
 
 
     @RequestMapping("/doLike")
-    @GloballInterceptor(checkLogin = true,checkParams = true)
+    @GloballInterceptor(checkLogin = true,checkParams = true,frequencyType = UserOperFrequencyTypeEnum.DO_LIKE )
     public ResponseVo doLike (HttpSession session, @VerifyParam(required = true)Integer commentId){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         String objectId = String.valueOf(commentId);
@@ -141,7 +145,8 @@ public class ForumCommentController extends ABaseController{
             queryComment.setArticle_id(articleId);
             queryComment.setP_comment_id(pCommentId);
             String orderType = "comment_id asc";
-            List<ForumComment> commentList = forumCommentService.queryListByParam(null, queryComment, orderType, true, null, false);
+            Page<ForumComment> forumCommentPage = new Page<>(1, PageSize.SIZE10.getSize());
+            List<ForumComment> commentList = forumCommentService.queryListByParam(forumCommentPage, queryComment, orderType, true, null, false);
             return getSuccessResponseVo(commentList);
         }
 

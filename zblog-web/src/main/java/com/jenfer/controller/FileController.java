@@ -4,6 +4,7 @@ import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.config.WebConfig;
 import com.jenfer.constants.Constants;
 import com.jenfer.enums.ResponseCodeEnum;
+import com.jenfer.enums.UserOperFrequencyTypeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.utils.StringTools;
 import com.jenfer.vo.ResponseVo;
@@ -36,7 +37,7 @@ public class FileController extends ABaseController{
     private WebConfig webConfig;
 
     @RequestMapping("/uploadImage")
-    @GloballInterceptor(checkLogin = true)
+    @GloballInterceptor(checkLogin = true,frequencyType = UserOperFrequencyTypeEnum.IMAGE_UPLAOD)
     public ResponseVo uploadImage(MultipartFile file){
         if(file==null){
             throw new BusinessException(ResponseCodeEnum.CODE_600);

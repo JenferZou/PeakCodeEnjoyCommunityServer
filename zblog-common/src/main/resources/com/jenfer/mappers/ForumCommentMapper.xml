@@ -29,49 +29,101 @@
         good_count,status
     </sql>
 
+<!--    <sql id="query_condition_havemap">-->
+<!--        <where>-->
+<!--            <if test="article_id!= null">-->
+<!--                article_id = #{article_id}-->
+<!--            </if>-->
+<!--            <if test="p_comment_id!= null">-->
+<!--                AND p_comment_id = #{p_comment_id}-->
+<!--            </if>-->
+<!--            <if test="comment_id!= null">-->
+<!--                AND comment_id = #{comment_id}-->
+<!--            </if>-->
+<!--            <if test="user_id!= null">-->
+<!--                AND user_id = #{user_id}-->
+<!--            </if>-->
+<!--            <if test="nick_name!= null">-->
+<!--                AND nick_name = #{nick_name}-->
+<!--            </if>-->
+<!--            <if test="reply_user_id!= null">-->
+<!--                AND reply_user_id = #{reply_user_id}-->
+<!--            </if>-->
+<!--            <if test="reply_nick_name!= null">-->
+<!--                AND reply_nick_name = #{reply_nick_name}-->
+<!--            </if>-->
+<!--            <if test="top_type!= null">-->
+<!--                AND top_type = #{top_type}-->
+<!--            </if>-->
+<!--            <if test="status!= null">-->
+<!--                AND status = #{status}-->
+<!--            </if>-->
+<!--            <if test="post_time!= null">-->
+<!--                AND post_time = #{post_time}-->
+<!--            </if>-->
+<!--            <if test="good_count!= null">-->
+<!--                AND good_count = #{good_count}-->
+<!--            </if>-->
+<!--            <if test="content!= null">-->
+<!--                AND content like concat('%',#{content},'%')-->
+<!--            </if>-->
+<!--            <if test="img_path!= null">-->
+<!--                AND img_path like concat('%',#{img_path},'%')-->
+<!--            </if>-->
+<!--            <if test="user_ip_address!= null">-->
+<!--                AND user_ip_address like concat('%',#{user_ip_address},'%')-->
+<!--            </if>-->
+<!--            &#45;&#45;             查询待审核的-->
+<!--            <if test="current_id!=null">-->
+<!--                and (status=1 or (status=0 and user_id = #{current_id}))-->
+<!--            </if>-->
+
+<!--        </where>-->
+<!--    </sql>-->
+
     <sql id="query_condition">
         <where>
-            <if test="article_id!= null">
-                AND article_id = #{article_id}
+            <if test="forumComment.article_id!= null">
+                article_id = #{forumComment.article_id}
             </if>
-            <if test="p_comment_id!= null">
-                AND p_comment_id = #{p_comment_id}
+            <if test="forumComment.p_comment_id!= null">
+                AND p_comment_id = #{forumComment.p_comment_id}
             </if>
-            <if test="comment_id!= null">
-                AND comment_id = #{comment_id}
+            <if test="forumComment.comment_id!= null">
+                AND comment_id = #{forumComment.comment_id}
             </if>
-            <if test="user_id!= null">
-                AND user_id = #{user_id}
+            <if test="forumComment.user_id!= null">
+                AND user_id = #{forumComment.user_id}
             </if>
-            <if test="nick_name!= null">
-                AND nick_name = #{nick_name}
+            <if test="forumComment.nick_name!= null">
+                AND nick_name = #{forumComment.nick_name}
             </if>
-            <if test="reply_user_id!= null">
-                AND reply_user_id = #{reply_user_id}
+            <if test="forumComment.reply_user_id!= null">
+                AND reply_user_id = #{forumComment.reply_user_id}
             </if>
-            <if test="reply_nick_name!= null">
-                AND reply_nick_name = #{reply_nick_name}
+            <if test="forumComment.reply_nick_name!= null">
+                AND reply_nick_name = #{forumComment.reply_nick_name}
             </if>
-            <if test="top_type!= null">
-                AND top_type = #{top_type}
+            <if test="forumComment.top_type!= null">
+                AND top_type = #{forumComment.top_type}
             </if>
-            <if test="status!= null">
-                AND status = #{status}
+            <if test="forumComment.status!= null">
+                AND status = #{forumComment.status}
             </if>
-            <if test="post_time!= null">
-                AND post_time = #{post_time}
+            <if test="forumComment.post_time!= null">
+                AND post_time = #{forumComment.post_time}
             </if>
-            <if test="good_count!= null">
-                AND good_count = #{good_count}
+            <if test="forumComment.good_count!= null">
+                AND good_count = #{forumComment.good_count}
             </if>
-            <if test="content!= null">
-                AND content like concat('%',#{content},'%')
+            <if test="forumComment.content!= null">
+                AND content like concat('%',#{forumComment.content},'%')
             </if>
-            <if test="img_path!= null">
-                AND img_path like concat('%',#{img_path},'%')
+            <if test="forumComment.img_path!= null">
+                AND img_path like concat('%',#{forumComment.img_path},'%')
             </if>
-            <if test="user_ip_address!= null">
-                AND user_ip_address like concat('%',#{user_ip_address},'%')
+            <if test="forumComment.user_ip_address!= null">
+                AND user_ip_address like concat('%',#{forumComment.user_ip_address},'%')
             </if>
 --             查询待审核的
             <if test="current_id!=null">
@@ -85,8 +137,8 @@
     </update>
 
 
-    <select id="querySubCommentbyParam" resultType="com.jenfer.pojo.ForumComment">
-        select ${Base_Column_List}
+    <select id="querySubCommentbyParam" resultType="com.jenfer.pojo.ForumComment" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include>
         <if test="haveLike!=null and haveLike and current_id!=null">
         ,(select count(1) from like_record where like_record.object_id = forum_comment.comment_id and like_record.user_id = #{current_id}) likeType
         </if>
@@ -102,8 +154,8 @@
             order by ${orderBy}
         </if>
     </select>
-    <select id="queryCommentbyParam" resultType="com.jenfer.pojo.ForumComment">
-        select ${Base_Column_List}
+    <select id="queryCommentbyParam" resultType="com.jenfer.pojo.ForumComment" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include>
         <if test="haveLike!=null and haveLike and current_id!=null">
             ,(select count(1) from like_record where like_record.object_id = forum_comment.comment_id and like_record.user_id = #{current_id}) likeType
         </if>

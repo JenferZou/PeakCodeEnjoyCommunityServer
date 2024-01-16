@@ -192,8 +192,13 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     @Override
     public void updateUserInfo(UserInfo userInfo, MultipartFile avatar) {
         this.baseMapper.update(userInfo,new LambdaUpdateWrapper<UserInfo>().eq(UserInfo::getUser_id,userInfo.getUser_id()));
+        if(avatar!=null){
+            fileUtils.uploadFile2Local(avatar,userInfo.getUser_id(),FileUploadTypeEnum.AVATAR);
+        }
 
-    }
+        }
+
+
 
 
     public String getIpAddress(String ip){

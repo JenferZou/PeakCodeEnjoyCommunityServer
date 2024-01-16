@@ -4,7 +4,7 @@ public enum MessageTypeEnum {
 
     SYS(0,"sys","系统消息"),
     COMMENT(1,"reply","回复我的"),
-    ARTICLE(2,"likePost","攒了我的文章"),
+    ARTICLE_LIKE(2,"likePost","攒了我的文章"),
     COMMENT_LIKE(3,"likeComment","赞了我的评论"),
     DOWNLOAD_ATTACHMENT(4,"downloadAttachment","下载了我的附件");
 
@@ -29,6 +29,14 @@ public enum MessageTypeEnum {
         return null;
     }
 
+    public static MessageTypeEnum getByType(Integer type){
+        for (MessageTypeEnum item : MessageTypeEnum.values()){
+            if(item.getType().equals(type)){
+                return item;
+            }
+        }
+        return null;
+    }
     public Integer getType() {
         return type;
     }

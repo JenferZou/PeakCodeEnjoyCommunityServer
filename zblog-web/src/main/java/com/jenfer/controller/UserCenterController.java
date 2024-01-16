@@ -1,22 +1,17 @@
 package com.jenfer.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
 import com.jenfer.constants.Constants;
 import com.jenfer.dto.SessionWebUserDto;
-import com.jenfer.enums.ArticleStatusEnum;
-import com.jenfer.enums.ResponseCodeEnum;
-import com.jenfer.enums.UserStatusEnum;
+import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
-import com.jenfer.pojo.ForumArticle;
-import com.jenfer.pojo.LikeRecord;
-import com.jenfer.pojo.UserInfo;
-import com.jenfer.service.ForumArticleService;
-import com.jenfer.service.LikeRecordService;
-import com.jenfer.service.UserInfoService;
+import com.jenfer.pojo.*;
+import com.jenfer.service.*;
 import com.jenfer.utils.CopyTools;
 import com.jenfer.vo.ForumArticleVo;
 import com.jenfer.vo.PaginationResultVo;
@@ -43,6 +38,13 @@ public class UserCenterController extends ABaseController{
 
     @Autowired
     private LikeRecordService likeRecordService;
+
+    @Autowired
+    private UserIntegralRecordService userIntegralRecordService;
+
+
+    @Autowired
+    private UserMessageService userMessageService;
 
 
     @RequestMapping("getUserInfo")
@@ -119,6 +121,7 @@ public class UserCenterController extends ABaseController{
                                      MultipartFile avatar){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         UserInfo userInfo = new UserInfo();
+        userInfo.setUser_id(userDto.getUserId());
         userInfo.setSex(sex);
         userInfo.setPerson_description(persionDescription);
         userInfoService.updateUserInfo(userInfo,avatar);
@@ -128,5 +131,74 @@ public class UserCenterController extends ABaseController{
 
 
 
+
+    @RequestMapping("/loadUserIntegralRecord")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo loadUserIntegralRecord(HttpSession session, Integer pageNo,String createTimeStart,String createTimeEnd){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+        LambdaQueryWrapper<UserIntegralRecord> userIntegralRecordLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userIntegralRecordLambdaQueryWrapper.eq(UserIntegralRecord::getUser_id,userDto.getUserId())
+                .between(UserIntegralRecord::getCreate_time,createTimeStart,createTimeEnd)
+                .orderByDesc(UserIntegralRecord::getRecord_id);
+        IPage<UserIntegralRecord> resultVo = userIntegralRecordService.page(new Page<>(pageNo == null ? Constants.ONE : pageNo, Constants.LENGTH_10), userIntegralRecordLambdaQueryWrapper);
+        PaginationResultVo<UserIntegralRecord> paginationResultVo = new PaginationResultVo<>();
+        paginationResultVo.setList(CopyTools.copyList(resultVo.getRecords(),UserIntegralRecord.class));
+        paginationResultVo.setPageNo(pageNo);
+        paginationResultVo.setPageSize((int) resultVo.getSize());
+        paginationResultVo.setTotalCount((int) resultVo.getTotal());
+        paginationResultVo.setPageTotal((int) resultVo.getPages());
+        return getSuccessResponseVo(paginationResultVo);
+
     }
+
+
+
+    @RequestMapping("/getMessageCount")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo getMessageCount(HttpSession session){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+
+        return getSuccessResponseVo(userMessageService.getUserMessageCount(userDto.getUserId()));
+
+    }
+
+
+
+    @RequestMapping("/loadMessageList")
+    @GloballInterceptor(checkParams = true,checkLogin = true)
+    public ResponseVo loadMessageList(HttpSession session,@VerifyParam(required = true) String code,Integer pageNo){
+        SessionWebUserDto userDto = getUserInfoFromSession(session);
+        MessageTypeEnum typeEnum = MessageTypeEnum.getByCode(code);
+        if(null==typeEnum){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        LambdaQueryWrapper<UserMessage> userMessageLambdaQueryWrapper = new LambdaQueryWrapper<UserMessage>();
+        userMessageLambdaQueryWrapper.eq(UserMessage::getReceived_user_id,userDto.getUserId())
+                .eq(UserMessage::getMessage_type,typeEnum.getType())
+                .eq(UserMessage::getReceived_user_id,userDto.getUserId())
+                .orderByDesc(UserMessage::getMessage_id);
+        IPage<UserMessage> resultVo = userMessageService.page(new Page<>(pageNo == null ? Constants.ONE : pageNo, Constants.LENGTH_10), userMessageLambdaQueryWrapper);
+        PaginationResultVo paginationResultVo = new PaginationResultVo<UserMessage>();
+        paginationResultVo.setList(CopyTools.copyList(resultVo.getRecords(),UserMessage.class));
+        paginationResultVo.setPageNo(pageNo);
+        paginationResultVo.setPageSize((int) resultVo.getSize());
+        paginationResultVo.setTotalCount((int) resultVo.getTotal());
+        paginationResultVo.setPageTotal((int) resultVo.getPages());
+
+        //将读过的消息设置成已读
+        if(pageNo==null||pageNo==1){
+            LambdaUpdateWrapper<UserMessage> userMessageLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            userMessageLambdaUpdateWrapper.eq(UserMessage::getReceived_user_id,userDto.getUserId())
+                    .eq(UserMessage::getMessage_type,typeEnum.getType())
+                    .set(UserMessage::getStatus, MessageStatusEnum.READ.getStatus());
+            userMessageService.update(userMessageLambdaUpdateWrapper);
+        }
+
+
+        return getSuccessResponseVo(paginationResultVo);
+
+    }
+
+
+}
 

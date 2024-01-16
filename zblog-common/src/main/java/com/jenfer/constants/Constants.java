@@ -15,6 +15,8 @@ public class Constants {
     public static final String CHECK_CODE_KEY_EMAIL = "check_code_key_email";
 
     public static final String SESSION_KEY ="session_key";
+
+    public static final String SESSION_KEY_FREQUENCY ="session_key_frequency";
     public static final String NO_ADDRESS = "未知";
 
     public static final Integer LENGTH_5 = 5;
@@ -46,6 +48,7 @@ public class Constants {
     public static final String AVATAR_SUFFIX = ".jpg";
     public static final String[] IMAGE_SUFFIX = {".jpg", ".jpeg", ".png", ".gif", ".bmp","JPG","JPEG","PNG","GIF","BMP"};
 
+    public static final String STATUS_SUCCESS = "success";
 
 
 }

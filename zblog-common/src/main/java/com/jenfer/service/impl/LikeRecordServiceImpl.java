@@ -59,7 +59,7 @@ public class LikeRecordServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRec
                 articleLike(objectId, forumArticle,userId, opType);
                 userMessage.setArticle_id(objectId);
                 userMessage.setArticle_title(forumArticle.getTitle());
-                userMessage.setMessage_type(MessageTypeEnum.ARTICLE.getType());
+                userMessage.setMessage_type(MessageTypeEnum.ARTICLE_LIKE.getType());
                 userMessage.setComment_id(Constants.ZERO);
                 userMessage.setReceived_user_id(forumArticle.getUser_id());
                 break;

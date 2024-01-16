@@ -9,11 +9,14 @@ public enum ResponseCodeEnum {
 
     CODE_601(601,"信息已存在"),
 
+    CODE_602(602,"信息提交过多"),
+
     CODE_500(500,"服务器返回错误，请联系管理员"),
 
     CODE_900(900,"请求超时"),
 
     CODE_901(901,"登陆超时");
+
 
 
     private Integer code;

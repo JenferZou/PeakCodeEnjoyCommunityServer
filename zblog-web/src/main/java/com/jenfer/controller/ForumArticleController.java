@@ -125,7 +125,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/doLike")
-    @GloballInterceptor(checkLogin = true,checkParams = true)
+    @GloballInterceptor(checkLogin = true,checkParams = true,frequencyType = UserOperFrequencyTypeEnum.DO_LIKE )
     public ResponseVo doLike (HttpSession session, @VerifyParam(required = true)String articleId){
         SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
         if(sessionWebUserDto==null){
@@ -229,7 +229,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/postArticle")
-    @GloballInterceptor(checkParams = true,checkLogin = true)
+    @GloballInterceptor(checkParams = true,checkLogin = true,frequencyType = UserOperFrequencyTypeEnum.POST_ARTICLE)
     public ResponseVo postArticle (HttpSession session,
                                    MultipartFile cover,
                                    MultipartFile attachment,
@@ -331,6 +331,31 @@ public class ForumArticleController extends ABaseController {
         forumArticleAttachment.setIntegral(integral==null?0:integral);
         forumArticleService.updateArticle(userDto.getAdmin(),forumArticle,forumArticleAttachment,cover,attachment);
         return getSuccessResponseVo(forumArticle.getArticle_id());
+    }
+
+
+    @RequestMapping("/search")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo search(HttpSession session,
+                             @VerifyParam(required = true)String keyword,
+                             @VerifyParam(required = true)Integer type,
+                             @VerifyParam(required = true)Integer pageNo){
+
+        LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+         forumArticleLambdaQueryWrapper.like(ForumArticle::getTitle, keyword);
+        Page<ForumArticle> forumArticlePage = new Page<>(pageNo == null ? Constants.ONE : pageNo, PageSize.SIZE10.getSize());
+        IPage<ForumArticle> result = forumArticleService.page(forumArticlePage, forumArticleLambdaQueryWrapper);
+        PaginationResultVo<ForumArticleVo> resultVo = new PaginationResultVo<>();
+        resultVo.setList(CopyTools.copyList(result.getRecords(), ForumArticleVo.class));
+        resultVo.setTotalCount((int)result.getTotal());
+        resultVo.setPageNo((int)result.getCurrent());
+        resultVo.setPageSize((int)result.getSize());
+        resultVo.setPageTotal((int)result.getPages());
+        return getSuccessResponseVo(resultVo);
+
+
+
+
     }
 
 

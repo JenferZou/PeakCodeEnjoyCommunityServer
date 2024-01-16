@@ -1,6 +1,7 @@
 package com.jenfer.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jenfer.dto.UserMessageCountDto;
 import com.jenfer.pojo.UserMessage;
 import org.springframework.stereotype.Service;
 
@@ -11,5 +12,8 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface UserMessageService extends IService<UserMessage> {
+
+    UserMessageCountDto getUserMessageCount(String userId);
+
 
 }

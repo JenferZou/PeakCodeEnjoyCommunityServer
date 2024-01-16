@@ -1,5 +1,7 @@
 package com.jenfer.annotation;
 
+import com.jenfer.enums.UserOperFrequencyTypeEnum;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.METHOD,ElementType.TYPE})
@@ -20,5 +22,9 @@ public @interface GloballInterceptor {
     boolean checkParams() default false;
 
 
+    /**
+     * 频次校验
+     */
+    UserOperFrequencyTypeEnum frequencyType() default UserOperFrequencyTypeEnum.NO_CHECK;
 
 }
