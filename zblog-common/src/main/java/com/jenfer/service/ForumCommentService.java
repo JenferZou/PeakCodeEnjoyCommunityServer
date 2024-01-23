@@ -30,4 +30,8 @@ public interface ForumCommentService extends IService<ForumComment> {
 
     void postComment(ForumComment forumComment, MultipartFile image);
 
+    Long queryCountByArticleId(String articleId);
+
+    Long queryCountByArticleIdAndPCommentId(String articleId, Integer pCommentId);
+
 }

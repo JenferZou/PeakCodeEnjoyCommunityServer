@@ -5,6 +5,7 @@ import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.enums.ResponseCodeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.utils.CopyTools;
+import com.jenfer.vo.CommentPaginationResultVo;
 import com.jenfer.vo.PaginationResultVo;
 import com.jenfer.vo.ResponseVo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,6 +79,17 @@ public class ABaseController {
         PaginationResultVo<T> resultVo = new PaginationResultVo<>();
         resultVo.setList(CopyTools.copyList(result.getList(), clazz));
         resultVo.setPageSize(result.getPageSize());
+        resultVo.setPageNo(result.getPageNo());
+        resultVo.setPageTotal(result.getPageTotal());
+        resultVo.setTotalCount(result.getTotalCount());
+        return resultVo;
+    }
+
+    protected <S, T> CommentPaginationResultVo<T> convert2CommentPaginationVo(CommentPaginationResultVo<S> result, Class<T> clazz) {
+        CommentPaginationResultVo<T> resultVo = new CommentPaginationResultVo<>();
+        resultVo.setList(CopyTools.copyList(result.getList(), clazz));
+        resultVo.setPageSize(result.getPageSize());
+        resultVo.setCommentCount(result.getCommentCount());
         resultVo.setPageNo(result.getPageNo());
         resultVo.setPageTotal(result.getPageTotal());
         resultVo.setTotalCount(result.getTotalCount());

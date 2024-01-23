@@ -81,7 +81,7 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
             Map<Integer, List<ForumComment>> tempMap = subCommentList.stream().collect(Collectors.groupingBy(ForumComment::getP_comment_id));
 
             forumCommentList.forEach(item->{
-                item.setSub_forumComment_list(tempMap.get(item.getP_comment_id()));
+                item.setSub_forumComment_list(tempMap.get(item.getComment_id()));
             });
         }
 
@@ -145,7 +145,7 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
             }
         }
         //判断回复的用户是否存在
-        if(!StringTools.isEmpty(forumComment.getReply_nick_name())){
+        if(!StringTools.isEmpty(forumComment.getReply_user_id())){
             LambdaQueryWrapper<UserInfo> userInfoQuery = new LambdaQueryWrapper<>();
             userInfoQuery.eq(UserInfo::getUser_id,forumComment.getReply_user_id());
             UserInfo userInfo = userInfoService.getOne(userInfoQuery);
@@ -172,6 +172,20 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
 
     }
 
+    @Override
+    public Long queryCountByArticleId(String articleId) {
+        LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ForumComment::getArticle_id,articleId);
+       return this.baseMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public Long queryCountByArticleIdAndPCommentId(String articleId, Integer pCommentId) {
+        LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ForumComment::getArticle_id,articleId).eq(ForumComment::getP_comment_id,pCommentId);
+        return this.baseMapper.selectCount(wrapper);
+    }
+
 
     public void updateCommentInfo(ForumComment forumComment,ForumArticle forumArticle,ForumComment pComment){
         Integer commengIntegral = SysCacheUtils.getSysSetting().getSysSettingCommentDto().getCommentIntegral();
@@ -179,9 +193,13 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
            userInfoService.updateUserIntegral(forumComment.getUser_id(), UserIntegralOperTypeEnum.POST_COMMENT,
                    UserIntegralChangeTypeEnum.ADD.getChangeType(), commengIntegral);
         }
-        if(forumComment.getP_comment_id()==0){
-            forumArticleMapper.updateArticleCount(UpdateArticleTypeEnum.COMMENT_COUNT.getType(), Constants.ONE,forumComment.getArticle_id());
-        }
+        //评论数只包含一级评论的情况
+//        if(forumComment.getP_comment_id()==0){
+//            forumArticleMapper.updateArticleCount(UpdateArticleTypeEnum.COMMENT_COUNT.getType(), Constants.ONE,forumComment.getArticle_id());
+//        }
+        //评论数包含一级评论和二级评论
+        forumArticleMapper.updateArticleCount(UpdateArticleTypeEnum.COMMENT_COUNT.getType(), Constants.ONE,forumComment.getArticle_id());
+
 
         //记录消息
         UserMessage userMessage = new UserMessage();

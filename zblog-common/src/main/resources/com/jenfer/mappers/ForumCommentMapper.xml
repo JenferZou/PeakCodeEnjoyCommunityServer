@@ -133,7 +133,7 @@
         </where>
     </sql>
     <update id="updateCommentGoodCount">
-        update forum_comment set good_count = good_count + #{changeCount} where comment_id = #{objectId}
+        update forum_comment set good_count = good_count + #{changeCount} where comment_id = #{commentId}
     </update>
 
 

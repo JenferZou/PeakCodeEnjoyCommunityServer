@@ -1,6 +1,7 @@
 package com.jenfer.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
@@ -15,6 +16,7 @@ import com.jenfer.service.ForumCommentService;
 import com.jenfer.service.LikeRecordService;
 import com.jenfer.utils.StringTools;
 import com.jenfer.utils.SysCacheUtils;
+import com.jenfer.vo.CommentPaginationResultVo;
 import com.jenfer.vo.PaginationResultVo;
 import com.jenfer.vo.ResponseVo;
 import jakarta.servlet.http.HttpSession;
@@ -68,13 +70,20 @@ public class ForumCommentController extends ABaseController{
         }else {
             forumComment.setStatus(ArticleStatusEnum.AUDIT.getStatus());
         }
-        Page<ForumComment> forumCommentPage = new Page<>(pageNo==null?1:pageNo, PageSize.SIZE50.getSize());
+        Page<ForumComment> forumCommentPage = new Page<>(pageNo==null?1:pageNo, PageSize.SIZE10.getSize());
         forumComment.setP_comment_id(0);
         List<ForumComment> forumCommentList = forumCommentService.queryListByParam(forumCommentPage, forumComment, orderBy, queryChildren, currentId, queryHaveLike);
-        PaginationResultVo<ForumComment> resultVo = new PaginationResultVo<>();
+        //包括二级评论的评论数量
+        Long commentCount = forumCommentService.queryCountByArticleId(articleId);
+        //一级评论数目
+        Long commentCountExcludeSub = forumCommentService.queryCountByArticleIdAndPCommentId(articleId, 0);
+        CommentPaginationResultVo<ForumComment> resultVo = new CommentPaginationResultVo<>();
         resultVo.setList(forumCommentList);
         resultVo.setPageNo(pageNo);
-        return  getSuccessResponseVo(convert2PaginationVo(resultVo,ForumComment.class));
+        resultVo.setPageSize(PageSize.SIZE10.getSize());
+        resultVo.setTotalCount(commentCountExcludeSub.intValue());
+        resultVo.setCommentCount(commentCount.intValue());
+        return  getSuccessResponseVo(convert2CommentPaginationVo(resultVo,ForumComment.class));
 
     }
 

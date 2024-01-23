@@ -42,7 +42,7 @@ public class FileUtils {
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMM");
             String month = simpleDateFormat.format(new Date());
-            String baseFolder = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE ;
+            String baseFolder = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE +Constants.FILE_FOLDER_IMAGE ;
             File targetFileFolder = new File(baseFolder+month+"/");
             String fileName = StringTools.getRandomString(Constants.LENGTH_15)+fileSuffix;
             File targetFile = new File(targetFileFolder.getPath()+"/"+fileName);
@@ -61,7 +61,7 @@ public class FileUtils {
             //压缩图片
             if(uploadTypeEnum==FileUploadTypeEnum.COMMEMT_IMAGE){
                 String thumbnailName  = targetFile.getName().replace(".","_.");
-                File thumbnail = new File(targetFile.getPath()+"/"+thumbnailName);
+                File thumbnail = new File(targetFileFolder.getPath()+"/"+thumbnailName);
                 Boolean thumbailCreated = imageUtils.createThumbnail(targetFile,Constants.LENGTH_200,Constants.LENGTH_200,thumbnail);
                 if(!thumbailCreated){
                     org.apache.commons.io.FileUtils.copyFile(targetFile,thumbnail);
