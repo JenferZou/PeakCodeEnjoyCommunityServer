@@ -59,14 +59,14 @@ public class FileController extends ABaseController{
             String fileName = file.getOriginalFilename();
             String fileExtName = StringTools.getFileSuffix(fileName);
             String fileRealName = StringTools.getRandomString(Constants.LENGTH_30)+fileExtName;
-            String folderPath = webConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE+Constants.FILE_FOLDER_TEMP;
+            String folderPath = webConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE+Constants.FILE_FOLDER_TEMP_2;
             File folder = new File(folderPath);
            if(!folder.exists()){
                folder.mkdirs();
            }
-           File uploadFile = new File(folderPath+"/"+fileRealName);
+           File uploadFile = new File(folderPath+fileRealName);
            file.transferTo(uploadFile);
-           return Constants.FILE_FOLDER_TEMP_2+"/"+fileRealName;
+           return Constants.FILE_FOLDER_TEMP_2+fileRealName;
 
         }catch (Exception e){
             logger.error("上传文件失败");
@@ -98,6 +98,9 @@ public class FileController extends ABaseController{
     }
 
     public void readImage(HttpServletResponse response, String imageFolder, String imageName){
+        System.out.println("===="+imageFolder+"=====");
+        System.out.println("===="+imageName+"=====");
+
         ServletOutputStream sos =null;  // 声明并初始化sos对象，用于输出响应内容
         FileInputStream in =null;  // 声明并初始化in对象，用于读取文件
         ByteArrayOutputStream baos = null;  // 声明并初始化baos对象，用于暂存文件内容
@@ -110,9 +113,11 @@ public class FileController extends ABaseController{
             //
             String filePath = webConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE+Constants.FILE_FOLDER_IMAGE+
                     imageFolder+"/"+imageName;  // 构造文件路径
-            if(Constants.FILE_FOLDER_TEMP_2.equals(imageFolder)||imageFolder.contains(Constants.FILE_FOLDER_AVATAR_NAME)){
+            if(Constants.FILE_FOLDER_TEMP_1.equals(imageFolder)||imageFolder.contains(Constants.FILE_FOLDER_AVATAR_NAME)){
                 filePath = webConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE+imageFolder+"/"+imageName;  // 如果imageFolder为 Constants.FILE_FOLDER_TEMP_2或者包含 Constants.FILE_FOLDER_AVATAR_NAME，则重新构造文件路径
             }
+            System.out.println("===="+filePath+"=====");
+
             File file = new File(filePath);  // 创建文件对象
             if(!file.exists()){  // 判断文件是否存在
                 return;  // 如果文件不存在，则直接返回
@@ -133,24 +138,24 @@ public class FileController extends ABaseController{
         }catch (Exception e){
             logger.error("读取图片失败",e);  // 捕获异常并记录日志
         }finally {
-            if(baos!=null){
+            if (baos != null) {
                 try {
                     baos.close();  // 关闭字节数组输出流
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if(sos!=null){
+            if (sos != null) {
                 try {
-                    baos.close();  // 关闭响应输出流
-                }catch (IOException e){
+                    sos.close();  // 关闭响应输出流
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if(in!=null){
+            if (in != null) {
                 try {
-                    baos.close();  // 关闭文件输入流
-                }catch (IOException e){
+                    in.close();  // 关闭文件输入流
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

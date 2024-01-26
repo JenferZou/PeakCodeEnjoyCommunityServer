@@ -117,12 +117,13 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
         //如果要换一个评论置顶那么先将当前文章的置顶评论给取消然后新增新的评论置顶
         if(CommentTopTypeEnum.TOP.getType().equals(topType)){
             LambdaUpdateWrapper<ForumComment> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(ForumComment::getArticle_id,forumComment.getArticle_id()).set(ForumComment::getTop_type,0);
+            updateWrapper.eq(ForumComment::getArticle_id,forumComment.getArticle_id())
+                    .eq(ForumComment::getTop_type,CommentTopTypeEnum.TOP.getType()).set(ForumComment::getTop_type,CommentTopTypeEnum.NO_TOP.getType());
             this.baseMapper.update(null,updateWrapper);
         }
-        ForumComment updateForumComment = new ForumComment();
-        updateForumComment.setTop_type(topType);
-        this.baseMapper.updateById(updateForumComment);
+
+        forumComment.setTop_type(topType);
+        this.baseMapper.updateById(forumComment);
 
 
     }

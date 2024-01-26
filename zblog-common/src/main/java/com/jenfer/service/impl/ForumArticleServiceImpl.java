@@ -87,6 +87,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         resetBoardInfo(isAdmin,forumArticle);
         Date curDate = new Date();
         String articleId = StringTools.getRandomString(Constants.LENGTH_15);
+        forumArticle.setArticle_id(articleId);
         forumArticle.setPost_time(curDate);
         forumArticle.setLast_update_time(curDate);
         if (cover != null) {
@@ -133,7 +134,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
     @Override
     public void updateArticle(Boolean isAdmin, ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover, MultipartFile attachment) {
         ForumArticle dbInfo = this.baseMapper.selectById(forumArticle.getArticle_id());
-        if(!isAdmin&&dbInfo.getUser_id().equals(forumArticle.getUser_id())){
+        if(!isAdmin&&!dbInfo.getUser_id().equals(forumArticle.getUser_id())){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
         forumArticle.setLast_update_time(new Date());
@@ -203,7 +204,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
 
     public void resetBoardInfo(Boolean isAdmin,ForumArticle forumArticle){
         LambdaQueryWrapper<ForumBoard> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ForumBoard::getP_board_id,forumArticle.getP_board_id());
+        queryWrapper.eq(ForumBoard::getBoard_id,forumArticle.getP_board_id());
         ForumBoard pBoard = forumBoardService.getOne(queryWrapper);
         if (pBoard==null||pBoard.getPost_type()==Constants.ZERO&&!isAdmin){
             throw new BusinessException("一级板块不存在");
@@ -211,7 +212,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         forumArticle.setP_board_name(pBoard.getBoard_name());
         if(forumArticle.getBoard_id()!=null&&forumArticle.getBoard_id()!=0){
             LambdaQueryWrapper<ForumBoard> queryboardWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(ForumBoard::getBoard_id,forumArticle.getBoard_id());
+            queryboardWrapper.eq(ForumBoard::getBoard_id,forumArticle.getBoard_id());
             ForumBoard board = forumBoardService.getOne(queryboardWrapper);
             if(board==null || board.getPost_type()==Constants.ZERO&&!isAdmin){
                 throw new BusinessException("二级板块不存在");

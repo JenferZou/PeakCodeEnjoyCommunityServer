@@ -38,6 +38,8 @@ public class Constants {
 
     public static final String FILE_FOLDER_TEMP_2 = "temp/";
 
+    public static final String FILE_FOLDER_TEMP_1= "temp";
+
     public static final String FILE_FOLDER_IMAGE = "images/";
 
     public static final String FILE_FOLDER_AVATAR_NAME = "avatar/";

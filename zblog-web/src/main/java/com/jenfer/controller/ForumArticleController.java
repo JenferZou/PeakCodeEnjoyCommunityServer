@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -232,15 +233,15 @@ public class ForumArticleController extends ABaseController {
     @GloballInterceptor(checkParams = true,checkLogin = true,frequencyType = UserOperFrequencyTypeEnum.POST_ARTICLE)
     public ResponseVo postArticle (HttpSession session,
                                    MultipartFile cover,
-                                   MultipartFile attachment,
+                                   @RequestParam(value = "forumArticleAttachmentVo",required = false) MultipartFile attachment,
                                    Integer integral,
-                                   Integer boardId,
-                                   String markdownContent,
+                                   @RequestParam(value = "board_id",required = false)Integer boardId,
+                                   @RequestParam(value = "markdown_content",required = false)String markdownContent,
                                    @VerifyParam(max = 200) String summary,
                                    @VerifyParam(required = true)String content,
-                                   @VerifyParam(required = true)Integer editorType,
+                                   @RequestParam("editor_type")@VerifyParam(required = true)Integer editorType,
                                    @VerifyParam(required = true,max = 150)String title,
-                                   @VerifyParam(required = true)Integer pBoardId){
+                                   @RequestParam("p_board_id")@VerifyParam(required = true)Integer pBoardId){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
        title = StringTools.transPageHtml(title);
         ForumArticle forumArticle = new ForumArticle();
@@ -266,7 +267,6 @@ public class ForumArticleController extends ABaseController {
         ForumArticleAttachment forumArticleAttachment = new ForumArticleAttachment();
         forumArticleAttachment.setIntegral(integral==null?0:integral);
         forumArticleService.postArticle(userDto.getAdmin(),forumArticle,forumArticleAttachment,cover,attachment);
-
         return getSuccessResponseVo(forumArticle.getArticle_id());
     }
 
@@ -299,20 +299,21 @@ public class ForumArticleController extends ABaseController {
     @GloballInterceptor(checkParams = true,checkLogin = true)
     public ResponseVo updateArticle (HttpSession session,
                                    MultipartFile cover,
-                                   MultipartFile attachment,
+                                   @RequestParam(value = "forumArticleAttachmentVo",required = false)MultipartFile attachment,
                                    Integer integral,
-                                   Integer boardId,
-                                   String markdownContent,
+                                   @RequestParam(value = "board_id",required = false)Integer boardId,
+                                   @RequestParam(value = "markdown_content",required = false)String markdownContent,
                                    @VerifyParam(required = true) Integer attachmentType,
-                                   @VerifyParam(required = true,max = 150)String articleId,
+                                   @RequestParam("article_id") @VerifyParam(required = true,max = 150)String articleId,
                                    @VerifyParam(max = 200) String summary,
                                    @VerifyParam(required = true)String content,
-                                   @VerifyParam(required = true)Integer editorType,
+                                   @RequestParam("editor_type") @VerifyParam(required = true)Integer editorType,
                                    @VerifyParam(required = true,max = 150)String title,
-                                   @VerifyParam(required = true)Integer pBoardId){
+                                   @RequestParam(value = "p_board_id")@VerifyParam(required = true)Integer pBoardId){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         title = StringTools.transPageHtml(title);
         ForumArticle forumArticle = new ForumArticle();
+        forumArticle.setArticle_id(articleId);
         forumArticle.setP_board_id(pBoardId);
         forumArticle.setBoard_id(boardId);
         forumArticle.setTitle(title);

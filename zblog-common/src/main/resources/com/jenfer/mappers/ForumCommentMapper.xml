@@ -164,8 +164,10 @@
         <if test="current_id!=null">
             AND (status = 1 or user_id = #{current_id})
         </if>
+        <!-- 加入置顶排序 -->
+        order by top_type DESC
         <if test="orderBy!=null">
-            order by ${orderBy}
+            ,${orderBy}
         </if>
     </select>
 </mapper>
