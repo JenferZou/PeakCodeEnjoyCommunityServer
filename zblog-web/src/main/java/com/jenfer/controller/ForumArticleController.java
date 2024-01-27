@@ -222,6 +222,9 @@ public class ForumArticleController extends ABaseController {
     public ResponseVo loadBoard4Post (HttpSession session){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         Integer postType = Constants.ZERO;
+        if(userDto==null){
+            throw new BusinessException("未检测到当前登录用户信息,请刷新页面或重新登陆");
+        }
         if(!userDto.getAdmin()){
             postType = Constants.ONE;
         }

@@ -98,9 +98,6 @@ public class FileController extends ABaseController{
     }
 
     public void readImage(HttpServletResponse response, String imageFolder, String imageName){
-        System.out.println("===="+imageFolder+"=====");
-        System.out.println("===="+imageName+"=====");
-
         ServletOutputStream sos =null;  // 声明并初始化sos对象，用于输出响应内容
         FileInputStream in =null;  // 声明并初始化in对象，用于读取文件
         ByteArrayOutputStream baos = null;  // 声明并初始化baos对象，用于暂存文件内容
@@ -116,7 +113,6 @@ public class FileController extends ABaseController{
             if(Constants.FILE_FOLDER_TEMP_1.equals(imageFolder)||imageFolder.contains(Constants.FILE_FOLDER_AVATAR_NAME)){
                 filePath = webConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE+imageFolder+"/"+imageName;  // 如果imageFolder为 Constants.FILE_FOLDER_TEMP_2或者包含 Constants.FILE_FOLDER_AVATAR_NAME，则重新构造文件路径
             }
-            System.out.println("===="+filePath+"=====");
 
             File file = new File(filePath);  // 创建文件对象
             if(!file.exists()){  // 判断文件是否存在

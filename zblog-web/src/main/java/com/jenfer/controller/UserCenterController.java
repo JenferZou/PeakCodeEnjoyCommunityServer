@@ -3,6 +3,7 @@ package com.jenfer.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
@@ -20,6 +21,7 @@ import com.jenfer.vo.UserInfoVo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,8 +80,9 @@ public class UserCenterController extends ABaseController{
             throw new BusinessException(ResponseCodeEnum.CODE_404);
         }
         LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        forumArticleLambdaQueryWrapper.eq(ForumArticle::getUser_id,userId).eq(ForumArticle::getStatus, ArticleStatusEnum.AUDIT.getStatus());
-       forumArticleLambdaQueryWrapper.orderByDesc(ForumArticle::getPost_time);
+        forumArticleLambdaQueryWrapper
+                .orderByDesc(ForumArticle::getTop_type)
+                .orderByDesc(ForumArticle::getPost_time);
        if(type==0){
            forumArticleLambdaQueryWrapper.eq(ForumArticle::getUser_id,userId);
        }else if(type==1){
@@ -87,18 +90,15 @@ public class UserCenterController extends ABaseController{
            forumArticleLambdaQueryWrapper.inSql(ForumArticle::getArticle_id,
                    "select article_id from forum_comment where user_id = '" + userId + "' and status = 1");
        } else if (type==2) {
-           //点击就查询自己点过咱的文章
+           //点击就查询自己点过赞的文章
            forumArticleLambdaQueryWrapper.inSql(ForumArticle::getArticle_id,
-                   "select article_id from like_record where user_id = '" + userId + "' and op_type = 0 and status = 1");
+                   "select object_id from like_record where user_id = '" + userId + "' and op_type = 0 and status = 1");
        }
 
         SessionWebUserDto userDto = getUserInfoFromSession(session);
-        if (userDto != null) {
-            forumArticleLambdaQueryWrapper.eq(ForumArticle::getUser_id, userDto.getUserId());
-        }else {
+        if (userDto == null) {
             forumArticleLambdaQueryWrapper.eq(ForumArticle::getStatus, ArticleStatusEnum.AUDIT.getStatus());
         }
-
         Page<ForumArticle> forumArticlePage = new Page<>(pageNo==null? Constants.ONE : pageNo, Constants.LENGTH_10);
 
 
@@ -117,7 +117,9 @@ public class UserCenterController extends ABaseController{
 
     @RequestMapping("/updateUserInfo")
     @GloballInterceptor(checkParams = true)
-    public ResponseVo updateUserInfo(HttpSession session, Integer sex, @VerifyParam(max = 100)String persionDescription,
+    public ResponseVo updateUserInfo(HttpSession session,
+                                     Integer sex,
+                                     @RequestParam("person_description") @VerifyParam(max = 100)String persionDescription,
                                      MultipartFile avatar){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         UserInfo userInfo = new UserInfo();
@@ -138,8 +140,10 @@ public class UserCenterController extends ABaseController{
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         LambdaQueryWrapper<UserIntegralRecord> userIntegralRecordLambdaQueryWrapper = new LambdaQueryWrapper<>();
         userIntegralRecordLambdaQueryWrapper.eq(UserIntegralRecord::getUser_id,userDto.getUserId())
-                .between(UserIntegralRecord::getCreate_time,createTimeStart,createTimeEnd)
                 .orderByDesc(UserIntegralRecord::getRecord_id);
+        if (StringUtils.isNotBlank(createTimeStart) && StringUtils.isNotBlank(createTimeEnd)) {
+            userIntegralRecordLambdaQueryWrapper.between(UserIntegralRecord::getCreate_time, createTimeStart, createTimeEnd);
+        }
         IPage<UserIntegralRecord> resultVo = userIntegralRecordService.page(new Page<>(pageNo == null ? Constants.ONE : pageNo, Constants.LENGTH_10), userIntegralRecordLambdaQueryWrapper);
         PaginationResultVo<UserIntegralRecord> paginationResultVo = new PaginationResultVo<>();
         paginationResultVo.setList(CopyTools.copyList(resultVo.getRecords(),UserIntegralRecord.class));

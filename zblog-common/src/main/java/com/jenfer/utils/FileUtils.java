@@ -42,8 +42,9 @@ public class FileUtils {
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMM");
             String month = simpleDateFormat.format(new Date());
-            String baseFolder = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE +Constants.FILE_FOLDER_IMAGE ;
-            File targetFileFolder = new File(baseFolder+month+"/");
+            String baseFolder = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE ;
+            //如果是文件类型的话就加/attachment前缀
+            File targetFileFolder = new File(baseFolder+Constants.FILE_FOLDER_ATTACHMENT+month+"/");
             String fileName = StringTools.getRandomString(Constants.LENGTH_15)+fileSuffix;
             File targetFile = new File(targetFileFolder.getPath()+"/"+fileName);
             String localPath = month + "/" +fileName;
