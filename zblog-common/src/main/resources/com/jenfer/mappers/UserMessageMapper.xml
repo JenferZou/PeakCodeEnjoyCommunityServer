@@ -24,6 +24,7 @@
         send_nick_name,message_type,message_content,
         status,create_time
     </sql>
+
     <select id="selectUserMessageCount" resultType="java.util.Map">
         select message_type messageType, count(1) count from user_message
         where received_user_id = #{userId} and status = 1 group by message_type

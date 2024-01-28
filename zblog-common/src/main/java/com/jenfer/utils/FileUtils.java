@@ -55,12 +55,20 @@ public class FileUtils {
                 targetFile = new File(targetFileFolder.getPath()+"/"+folder+Constants.AVATAR_SUFFIX);
                 localPath = folder+Constants.AVATAR_SUFFIX;
             }
+            if(uploadTypeEnum==FileUploadTypeEnum.ARTICLE_COVER){
+                //文章封面图片上传
+                targetFileFolder = new File(baseFolder+Constants.FILE_FOLDER_IMAGE+month+"/");
+                 targetFile = new File(targetFileFolder.getPath()+"/"+fileName);
+                 localPath = month + "/" +fileName;
+            }
+
             if(!targetFileFolder.exists()){
                 targetFileFolder.mkdirs();
             }
             file.transferTo(targetFile);
             //压缩图片
             if(uploadTypeEnum==FileUploadTypeEnum.COMMEMT_IMAGE){
+                targetFileFolder = new File(baseFolder+Constants.FILE_FOLDER_IMAGE+month+"/");
                 String thumbnailName  = targetFile.getName().replace(".","_.");
                 File thumbnail = new File(targetFileFolder.getPath()+"/"+thumbnailName);
                 Boolean thumbailCreated = imageUtils.createThumbnail(targetFile,Constants.LENGTH_200,Constants.LENGTH_200,thumbnail);

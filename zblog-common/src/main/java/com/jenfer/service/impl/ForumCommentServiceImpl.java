@@ -207,9 +207,11 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
         userMessage.setMessage_type(MessageTypeEnum.COMMENT.getType());
         userMessage.setCreate_time(new Date());
         userMessage.setArticle_id(forumComment.getArticle_id());
+        userMessage.setMessage_content(forumComment.getContent());
         userMessage.setArticle_title(forumArticle.getTitle());
         userMessage.setComment_id(forumComment.getComment_id());
-        userMessage.setSend_user_id(forumComment.getUser_id());
+        userMessage.setSend_user_id(forumComment.getReply_user_id());
+        userMessage.setReceived_user_id(forumComment.getUser_id());
         userMessage.setSend_nick_name(forumComment.getNick_name());
         userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
         //当前评论的是文章的作者

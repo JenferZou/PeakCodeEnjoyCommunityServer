@@ -3,6 +3,7 @@ package com.jenfer.mappers;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jenfer.pojo.UserMessage;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,6 +19,7 @@ import java.util.Map;
 @Mapper
 public interface UserMessageMapper extends BaseMapper<UserMessage> {
 
+    @MapKey("messageType")
     List<Map> selectUserMessageCount(@Param("userId") String userId);
 
 }

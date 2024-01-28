@@ -136,7 +136,9 @@ public class UserCenterController extends ABaseController{
 
     @RequestMapping("/loadUserIntegralRecord")
     @GloballInterceptor(checkParams = true)
-    public ResponseVo loadUserIntegralRecord(HttpSession session, Integer pageNo,String createTimeStart,String createTimeEnd){
+    public ResponseVo loadUserIntegralRecord(HttpSession session, Integer pageNo,
+                                             String createTimeStart,
+                                             String createTimeEnd){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         LambdaQueryWrapper<UserIntegralRecord> userIntegralRecordLambdaQueryWrapper = new LambdaQueryWrapper<>();
         userIntegralRecordLambdaQueryWrapper.eq(UserIntegralRecord::getUser_id,userDto.getUserId())
@@ -161,7 +163,9 @@ public class UserCenterController extends ABaseController{
     @GloballInterceptor(checkParams = true)
     public ResponseVo getMessageCount(HttpSession session){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
-
+        if(null==userDto){
+            throw new BusinessException("未检测到当前登录信息或登录信息失效,请重试");
+        }
         return getSuccessResponseVo(userMessageService.getUserMessageCount(userDto.getUserId()));
 
     }
