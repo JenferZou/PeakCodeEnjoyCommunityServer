@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -341,9 +342,8 @@ public class ForumArticleController extends ABaseController {
     @RequestMapping("/search")
     @GloballInterceptor(checkParams = true)
     public ResponseVo search(HttpSession session,
-                             @VerifyParam(required = true)String keyword,
-                             @VerifyParam(required = true)Integer type,
-                             @VerifyParam(required = true)Integer pageNo){
+                            @VerifyParam(required = true)String keyword,
+                            Integer pageNo){
 
         LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
          forumArticleLambdaQueryWrapper.like(ForumArticle::getTitle, keyword);
