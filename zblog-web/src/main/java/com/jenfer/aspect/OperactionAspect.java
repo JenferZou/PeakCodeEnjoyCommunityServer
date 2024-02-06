@@ -38,6 +38,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Date;
@@ -221,8 +222,25 @@ public class OperactionAspect {
     }
 
 
-    public void checkObjValue(Parameter parameter,Object value){
-
+    private void checkobjValue(Parameter parameter, Object value){
+        try{
+            String typeName = parameter.getParameterizedType().getTypeName ();
+            Class classz=Class.forName(typeName);
+            Field[] fields =classz.getDeclaredFields();
+            for (Field field :fields) {
+                VerifyParam fieldverifyParam = field.getAnnotation(VerifyParam.class);
+                if (fieldverifyParam == null) {
+                    continue;
+                }
+                field.setAccessible(true);
+                Object resultValue = field.get(value);
+                checkValue(resultValue, fieldverifyParam);
+            }
+        } catch(Exception e)
+        {
+            logger.error("校验参数失败",e);
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        };
     }
 
 
