@@ -16,18 +16,15 @@ import com.jenfer.mappers.ForumArticleMapper;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumArticleAttachment;
 import com.jenfer.pojo.ForumBoard;
-import com.jenfer.service.ForumArticleAttachmentService;
-import com.jenfer.service.ForumArticleService;
-import com.jenfer.service.ForumBoardService;
-import com.jenfer.service.UserInfoService;
-import com.jenfer.utils.FileUtils;
-import com.jenfer.utils.ImageUtils;
-import com.jenfer.utils.StringTools;
-import com.jenfer.utils.SysCacheUtils;
+import com.jenfer.pojo.UserMessage;
+import com.jenfer.service.*;
+import com.jenfer.utils.*;
+import com.jenfer.vo.ForumArticleRequestVo;
 import com.jenfer.vo.ForumArticleVo;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -55,6 +52,9 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
 
     @Autowired
     private ForumArticleAttachmentMapper forumArticleAttachmentmapper;
+
+    @Autowired
+    private UserMessageService userMessageService;
 
     @Autowired
     private ImageUtils imageUtils;
@@ -198,6 +198,62 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         forumArticleLambdaUpdateWrapper.eq(ForumArticle::getArticle_id,forumArticle.getArticle_id());
         this.baseMapper.update(forumArticle,forumArticleLambdaUpdateWrapper);
+
+    }
+
+    @Override
+    public IPage<ForumArticleVo> findArticleByList(ForumArticleRequestVo forumArticleRequestVo) {
+        ForumArticleVo forumArticleVo = CopyTools.copy(forumArticleRequestVo, ForumArticleVo.class);
+       Page<ForumArticle> page =  new Page(forumArticleRequestVo.getPageNo()==null?Constants.ONE:forumArticleRequestVo.getPageNo(),
+                forumArticleRequestVo.getPageSize()==null?Constants.LENGTH_10:forumArticleRequestVo.getPageSize());
+        return this.baseMapper.selectArticleList(page,forumArticleVo);
+    }
+
+    @Override
+    public void deleteForumArticleById(String articleIds) {
+        String[] articleIdArray = articleIds.split(",");
+        for (String articleId : articleIdArray) {
+            this.deleteArticleSingle(articleId);
+        }
+    }
+
+    @Override
+    public void updateBoard(String articleId, Integer pBoardId, Integer boardId) {
+        ForumArticle forumArticle = getById(articleId);
+        if(forumArticle==null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        forumArticle.setP_board_id(pBoardId);
+        forumArticle.setBoard_id(boardId);
+        resetBoardInfo(true,forumArticle);
+        this.baseMapper.updateById(forumArticle);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteArticleSingle(String articleId){
+        LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        forumArticleLambdaQueryWrapper.eq(ForumArticle::getArticle_id,articleId);
+        ForumArticle forumArticleInfo = this.baseMapper.selectOne(forumArticleLambdaQueryWrapper);
+        if(forumArticleInfo==null||ArticleStatusEnum.DEL.getStatus().equals(forumArticleInfo.getStatus())){
+            return;
+        }
+        LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        forumArticleLambdaUpdateWrapper.set(ForumArticle::getStatus,ArticleStatusEnum.DEL.getStatus());
+        update(forumArticleInfo,forumArticleLambdaUpdateWrapper);
+
+        Integer integral = SysCacheUtils.getSysSetting().getSysSettingPostDto().getPostIntegral();
+        if(integral>0&&ArticleStatusEnum.AUDIT.getStatus().equals(forumArticleInfo.getStatus())){
+            userInfoService.updateUserIntegral(forumArticleInfo.getUser_id(),UserIntegralOperTypeEnum.DEL_ARTICLE, UserIntegralChangeTypeEnum.REDUCE.getChangeType(), integral);
+        }
+
+        UserMessage userMessage = new UserMessage();
+        userMessage.setReceived_user_id(forumArticleInfo.getUser_id());
+        userMessage.setMessage_type(MessageTypeEnum.SYS.getType());
+        userMessage.setCreate_time(new Date());
+        userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
+        userMessage.setMessage_content("您的文章【"+forumArticleInfo.getTitle()+"】已被管理员删除");
+        userMessageService.save(userMessage);
+
 
     }
 

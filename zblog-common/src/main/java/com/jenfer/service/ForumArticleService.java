@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumArticleAttachment;
+import com.jenfer.vo.ForumArticleRequestVo;
 import com.jenfer.vo.ForumArticleVo;
 import com.jenfer.vo.PaginationResultVo;
 import org.apache.ibatis.annotations.Param;
@@ -27,8 +28,11 @@ public interface ForumArticleService extends IService<ForumArticle> {
     void updateArticle(Boolean isAdmin,ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover,MultipartFile attachment);
 
 
+    IPage<ForumArticleVo> findArticleByList(ForumArticleRequestVo forumArticleRequestVo);
 
 
+    void deleteForumArticleById(String articleId);
 
+    void updateBoard(String articleId,Integer pBoardId,Integer boardId);
 
 }

@@ -27,6 +27,9 @@ public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
 
 
 
+    IPage<ForumArticleVo> selectArticleList(Page<ForumArticle> forumArticlePage,ForumArticleVo forumArticleVo);
+
+
 }
 
 
