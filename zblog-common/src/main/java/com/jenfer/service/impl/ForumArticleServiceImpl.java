@@ -229,6 +229,35 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         this.baseMapper.updateById(forumArticle);
     }
 
+    @Override
+    public void auditArticle(String articleIds) {
+        String[] articleIdArray = articleIds.split(",");
+        for (String articleId : articleIdArray) {
+            this.auditArticleSingle(articleId);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void auditArticleSingle(String articleId) {
+        LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        forumArticleLambdaQueryWrapper.eq(ForumArticle::getArticle_id,articleId);
+        ForumArticle forumArticleInfo = this.baseMapper.selectOne(forumArticleLambdaQueryWrapper);
+        if(forumArticleInfo==null||!ArticleStatusEnum.NO_AUDIT.getStatus().equals(forumArticleInfo.getStatus())){
+            return;
+        }
+
+        LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        forumArticleLambdaUpdateWrapper.set(ForumArticle::getStatus,ArticleStatusEnum.AUDIT.getStatus());
+        update(forumArticleInfo,forumArticleLambdaUpdateWrapper);
+
+        Integer integral = SysCacheUtils.getSysSetting().getSysSettingPostDto().getPostIntegral();
+        if(integral>0&&ArticleStatusEnum.AUDIT.getStatus().equals(forumArticleInfo.getStatus())){
+            userInfoService.updateUserIntegral(forumArticleInfo.getUser_id(),UserIntegralOperTypeEnum.POST_ARTICLE, UserIntegralChangeTypeEnum.ADD.getChangeType(), integral);
+        }
+
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void deleteArticleSingle(String articleId){
         LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();

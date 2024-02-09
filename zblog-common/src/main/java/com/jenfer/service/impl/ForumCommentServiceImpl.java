@@ -187,6 +187,105 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
         return this.baseMapper.selectCount(wrapper);
     }
 
+    @Override
+    public List<ForumComment> queryListByParamByAdmin(Page<ForumComment> page, String articleId, Boolean queryChildren) {
+        LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ForumComment::getArticle_id,articleId).eq(ForumComment::getP_comment_id,Constants.ZERO).orderByDesc(ForumComment::getPost_time);
+        List<ForumComment> pCommentList = list(wrapper);
+        if(!pCommentList.isEmpty()&&queryChildren){
+            List<Integer>  pCommentIds = pCommentList.stream().map(ForumComment::getComment_id).distinct().collect(Collectors.toList());
+            LambdaQueryWrapper<ForumComment> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(ForumComment::getP_comment_id,pCommentIds).orderByDesc(ForumComment::getPost_time);
+            //二级评论
+            List<ForumComment> subCommentList = list(queryWrapper);
+
+            Map<Integer, List<ForumComment>> tempMap = subCommentList.stream().collect(Collectors.groupingBy(ForumComment::getP_comment_id));
+
+            pCommentList.forEach(item->{
+                item.setSub_forumComment_list(tempMap.get(item.getComment_id()));
+            });
+        }
+        return pCommentList;
+    }
+
+    @Override
+    public List<ForumComment> queryListFuzzyByAdmin(Page<ForumComment> page, String contentFuzzy, String nickNameFuzzy, Integer status, Boolean queryChildren) {
+        LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+        if(contentFuzzy!=null){
+            wrapper.like(ForumComment::getContent,contentFuzzy);
+        }
+        if(nickNameFuzzy!=null){
+            wrapper.like(ForumComment::getNick_name,nickNameFuzzy);
+        }
+        if (status!=null){
+            wrapper.eq(ForumComment::getStatus,status);
+        }
+        wrapper.orderByDesc(ForumComment::getPost_time);
+        List<ForumComment> pCommentList = list(wrapper);
+        if(!pCommentList.isEmpty()&&queryChildren){
+            List<Integer>  pCommentIds = pCommentList.stream().map(ForumComment::getComment_id).distinct().collect(Collectors.toList());
+            LambdaQueryWrapper<ForumComment> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(ForumComment::getP_comment_id,pCommentIds).orderByDesc(ForumComment::getPost_time);
+            //二级评论
+            List<ForumComment> subCommentList = list(queryWrapper);
+
+            Map<Integer, List<ForumComment>> tempMap = subCommentList.stream().collect(Collectors.groupingBy(ForumComment::getP_comment_id));
+
+            pCommentList.forEach(item->{
+                item.setSub_forumComment_list(tempMap.get(item.getComment_id()));
+            });
+        }
+        return pCommentList;
+    }
+
+    @Override
+    public void delComment(String commentIds) {
+        String[] commentIdArray = commentIds.split(",");
+        for (String commentIdStr : commentIdArray) {
+            int commentId = Integer.parseInt(commentIdStr);
+            this.delCommentSingle(commentId);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delCommentSingle(Integer commentId) {
+        LambdaQueryWrapper<ForumComment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ForumComment::getComment_id,commentId);
+        ForumComment forumComment = getOne(wrapper);
+        if(null==forumComment ||CommentStatusEnum.DEL.getStatus().equals(forumComment.getStatus())){
+            return;
+        }
+        LambdaUpdateWrapper<ForumComment> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(ForumComment::getComment_id,commentId).set(ForumComment::getStatus,CommentStatusEnum.DEL.getStatus());
+        update(forumComment,updateWrapper);
+
+        if(CommentStatusEnum.AUDIT.getStatus().equals(forumComment.getStatus())){
+            forumArticleMapper.updateArticleCount(UpdateArticleTypeEnum.COMMENT_COUNT.getType(), -1,forumComment.getArticle_id());
+            Integer integral = SysCacheUtils.getSysSetting().getSysSettingCommenDto().getCommentIntegral();
+            userInfoService.updateUserIntegral(forumComment.getUser_id(), UserIntegralOperTypeEnum.DEL_COMMENT,UserIntegralChangeTypeEnum.REDUCE.getChangeType(), integral);
+
+        }
+        UserMessage userMessage = new UserMessage();
+        userMessage.setReceived_user_id(forumComment.getUser_id());
+        userMessage.setMessage_type(MessageTypeEnum.SYS.getType());
+        userMessage.setCreate_time(new Date());
+        userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
+        userMessage.setMessage_content("评论【"+forumComment.getContent()+"】被管理员删除");
+        userMessageService.save(userMessage);
+
+    }
+
+    @Override
+    public void auditCommentSingle(Integer commentId) {
+
+    }
+
+    @Override
+    public void auditComment(String commentIds) {
+
+    }
+
 
     public void updateCommentInfo(ForumComment forumComment,ForumArticle forumArticle,ForumComment pComment){
         Integer commengIntegral = SysCacheUtils.getSysSetting().getSysSettingCommentDto().getCommentIntegral();

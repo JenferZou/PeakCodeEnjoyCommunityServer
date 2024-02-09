@@ -34,4 +34,22 @@ public interface ForumCommentService extends IService<ForumComment> {
 
     Long queryCountByArticleIdAndPCommentId(String articleId, Integer pCommentId);
 
+    List<ForumComment> queryListByParamByAdmin(Page<ForumComment> page,
+                                       String articleId,
+                                        Boolean queryChildren);
+
+
+    List<ForumComment> queryListFuzzyByAdmin(Page<ForumComment> page,
+                                             String contentFuzzy,String nickNameFuzzy,
+                                              Integer status,
+                                               Boolean queryChildren);
+
+    void delComment(String commentIds);
+
+    void delCommentSingle(Integer commentId);
+
+    void auditCommentSingle(Integer commentId);
+
+    void auditComment(String commentIds);
+
 }

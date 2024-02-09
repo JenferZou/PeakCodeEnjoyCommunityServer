@@ -35,4 +35,9 @@ public interface ForumArticleService extends IService<ForumArticle> {
 
     void updateBoard(String articleId,Integer pBoardId,Integer boardId);
 
+    void deleteArticleSingle(String articleId);
+    void auditArticle(String articleIds);
+
+    void auditArticleSingle(String articleId);
+
 }

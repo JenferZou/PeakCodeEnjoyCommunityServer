@@ -25,9 +25,11 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.ArrayUtils;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
@@ -64,8 +66,8 @@ public class OperactionAspect {
 
     }
 
-    @Around("requestInterceptor()")
-    public void interceptorDo(ProceedingJoinPoint point){
+    @Before("requestInterceptor()")
+    public void interceptorDo(JoinPoint point){
         try {
             Object target = point.getTarget();
             Object[] args = point.getArgs();
@@ -83,6 +85,8 @@ public class OperactionAspect {
             if(interceptor.checkParams()){
                 validateParams(method,args);
             }
+
+
 
         }catch (BusinessException e){
             logger.error("全局拦截器异常",e);
