@@ -17,4 +17,7 @@ public interface ForumBoardService extends IService<ForumBoard> {
     List<ForumBoard> getBoardTree(Integer postType);
 
 
+    void saveForumBoard(ForumBoard forumBoard);
+
+
 }

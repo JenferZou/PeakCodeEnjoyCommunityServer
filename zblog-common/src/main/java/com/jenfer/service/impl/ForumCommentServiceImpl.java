@@ -57,6 +57,7 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
 
 
 
+
     @Resource
     private FileUtils fileUtils;
     @Override
@@ -277,13 +278,33 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void auditCommentSingle(Integer commentId) {
+        ForumComment forumComment = this.baseMapper.selectById(commentId);
+        if(!CommentStatusEnum.NO_AUDIT.getStatus().equals(forumComment.getStatus())){
+            return;
+        }
+        LambdaUpdateWrapper<ForumComment> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(ForumComment::getStatus,CommentStatusEnum.AUDIT.getStatus());
+        update(forumComment,updateWrapper);
+        LambdaQueryWrapper<ForumArticle> forumArticleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        forumArticleLambdaQueryWrapper.eq(ForumArticle::getArticle_id,forumComment.getArticle_id());
+        ForumArticle forumArticle = forumArticleMapper.selectOne(forumArticleLambdaQueryWrapper);
+        ForumComment pComment = null;
+        if(forumComment.getP_comment_id()!=0&&StringTools.isEmpty(forumComment.getReply_user_id())){
+            pComment = this.baseMapper.selectById(forumComment.getP_comment_id());
+        }
+        updateCommentInfo(forumComment,forumArticle,pComment);
 
     }
 
     @Override
     public void auditComment(String commentIds) {
-
+        String[] commentIdArray = commentIds.split(",");
+        for(String commentIdStr : commentIdArray){
+            int commentId = Integer.parseInt(commentIdStr);
+            this.auditCommentSingle(commentId);
+        }
     }
 
 

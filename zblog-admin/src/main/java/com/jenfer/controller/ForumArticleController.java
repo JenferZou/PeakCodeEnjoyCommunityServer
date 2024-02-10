@@ -106,7 +106,7 @@ public class ForumArticleController extends ABaseController {
     @GloballInterceptor(checkLogin = true,checkParams = true)
     public void attachmentDownload (HttpSession session, HttpServletRequest request, HttpServletResponse response,
                                     @VerifyParam(required = true)String fileId){
-        ForumArticleAttachment attachment = forumArticleAttachmentService.downloadAttachment(fileId,getUserInfoFromSession(session));
+        ForumArticleAttachment attachment = forumArticleAttachmentService.getById(fileId);
         InputStream in = null;
         OutputStream out = null;
         String downloadFileName = attachment.getFile_name();
@@ -222,6 +222,12 @@ public class ForumArticleController extends ABaseController {
     @RequestMapping("/delComment")
     public ResponseVo delComment(@VerifyParam(required = true) String commentIds){
         forumCommentService.delComment(commentIds);
+        return getSuccessResponseVo(null);
+    }
+
+    @RequestMapping("/auditComment")
+    public ResponseVo auditComment(@VerifyParam(required = true) String commentIds){
+        forumCommentService.auditComment(commentIds);
         return getSuccessResponseVo(null);
     }
 
