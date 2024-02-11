@@ -222,7 +222,8 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
             wrapper.eq(ForumComment::getStatus,status);
         }
         wrapper.orderByDesc(ForumComment::getPost_time);
-        List<ForumComment> pCommentList = list(wrapper);
+        Page<ForumComment> pCommentListPage = page(page, wrapper);
+        List<ForumComment> pCommentList = pCommentListPage.getRecords();
         if(!pCommentList.isEmpty()&&queryChildren){
             List<Integer>  pCommentIds = pCommentList.stream().map(ForumComment::getComment_id).distinct().collect(Collectors.toList());
             LambdaQueryWrapper<ForumComment> queryWrapper = new LambdaQueryWrapper<>();

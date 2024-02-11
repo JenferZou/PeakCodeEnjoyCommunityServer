@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jenfer.pojo.ForumArticle;
+import com.jenfer.vo.ForumArticleFuzzyRequestVo;
 import com.jenfer.vo.ForumArticleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,7 +28,7 @@ public interface ForumArticleMapper extends BaseMapper<ForumArticle> {
 
 
 
-    IPage<ForumArticleVo> selectArticleList(Page<ForumArticle> forumArticlePage,ForumArticleVo forumArticleVo);
+    IPage<ForumArticleVo> selectArticleList(Page<ForumArticle> forumArticlePage, ForumArticleFuzzyRequestVo forumArticleFuzzyRequestVo);
 
 
 }

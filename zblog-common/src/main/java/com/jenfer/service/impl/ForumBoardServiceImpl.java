@@ -56,6 +56,10 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
                 throw new BusinessException("板块信息不存在");
             }
             this.baseMapper.updateById(forumBoard);
+            if(!dbInfo.getBoard_name().equals(forumBoard.getBoard_name())){
+                LambdaUpdateWrapper<ForumBoard> forumBoardLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+
+            }
 
         }
     }

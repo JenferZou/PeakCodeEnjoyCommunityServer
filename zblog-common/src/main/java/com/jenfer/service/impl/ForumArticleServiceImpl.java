@@ -13,15 +13,15 @@ import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.mappers.ForumArticleAttachmentMapper;
 import com.jenfer.mappers.ForumArticleMapper;
+import com.jenfer.mappers.ForumBoardMapper;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumArticleAttachment;
 import com.jenfer.pojo.ForumBoard;
 import com.jenfer.pojo.UserMessage;
 import com.jenfer.service.*;
 import com.jenfer.utils.*;
-import com.jenfer.vo.ForumArticleRequestVo;
+import com.jenfer.vo.ForumArticleFuzzyRequestVo;
 import com.jenfer.vo.ForumArticleVo;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
 
 
     @Autowired
-    private ForumBoardService forumBoardService;
+    private ForumBoardMapper forumBoardMapper;
 
     @Autowired
     private FileUtils fileUtils;
@@ -202,11 +202,10 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
     }
 
     @Override
-    public IPage<ForumArticleVo> findArticleByList(ForumArticleRequestVo forumArticleRequestVo) {
-        ForumArticleVo forumArticleVo = CopyTools.copy(forumArticleRequestVo, ForumArticleVo.class);
-       Page<ForumArticle> page =  new Page(forumArticleRequestVo.getPageNo()==null?Constants.ONE:forumArticleRequestVo.getPageNo(),
-                forumArticleRequestVo.getPageSize()==null?Constants.LENGTH_10:forumArticleRequestVo.getPageSize());
-        return this.baseMapper.selectArticleList(page,forumArticleVo);
+    public IPage<ForumArticleVo> findArticleByList(ForumArticleFuzzyRequestVo forumArticleFuzzyRequestVo) {
+       Page<ForumArticle> page =  new Page(forumArticleFuzzyRequestVo.getPageNo()==null?Constants.ONE: forumArticleFuzzyRequestVo.getPageNo(),
+                forumArticleFuzzyRequestVo.getPageSize()==null?Constants.LENGTH_10: forumArticleFuzzyRequestVo.getPageSize());
+       return this.baseMapper.selectArticleList(page, forumArticleFuzzyRequestVo);
     }
 
     @Override
@@ -290,7 +289,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
     public void resetBoardInfo(Boolean isAdmin,ForumArticle forumArticle){
         LambdaQueryWrapper<ForumBoard> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ForumBoard::getBoard_id,forumArticle.getP_board_id());
-        ForumBoard pBoard = forumBoardService.getOne(queryWrapper);
+        ForumBoard pBoard = forumBoardMapper.selectOne(queryWrapper);
         if (pBoard==null||pBoard.getPost_type()==Constants.ZERO&&!isAdmin){
             throw new BusinessException("一级板块不存在");
         }
@@ -298,7 +297,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         if(forumArticle.getBoard_id()!=null&&forumArticle.getBoard_id()!=0){
             LambdaQueryWrapper<ForumBoard> queryboardWrapper = new LambdaQueryWrapper<>();
             queryboardWrapper.eq(ForumBoard::getBoard_id,forumArticle.getBoard_id());
-            ForumBoard board = forumBoardService.getOne(queryboardWrapper);
+            ForumBoard board = forumBoardMapper.selectOne(queryboardWrapper);
             if(board==null || board.getPost_type()==Constants.ZERO&&!isAdmin){
                 throw new BusinessException("二级板块不存在");
             }

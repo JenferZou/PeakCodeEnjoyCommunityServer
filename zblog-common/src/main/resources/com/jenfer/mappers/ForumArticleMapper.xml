@@ -86,55 +86,19 @@
 </where>
     </sql>
 
-    <sql id="base_query_condition">
+    <sql id="fuzzy_query_condition">
         <where>
-            <if test="article_id!=null">
-                article_id = #{article_id}
+            <if test="forumArticleFuzzyRequestVo.titleFuzzy != null and forumArticleFuzzyRequestVo.titleFuzzy">
+                AND title like concat('%',#{forumArticleFuzzyRequestVo.titleFuzzy},'%')
             </if>
-            <if test="board_id != null">
-                AND board_id = #{board_id}
+            <if test="forumArticleFuzzyRequestVo.nickNameFuzzy != null and forumArticleFuzzyRequestVo.nickNameFuzzy">
+                AND nick_name like concat('%',#{forumArticleFuzzyRequestVo.nickNameFuzzy},'%')
             </if>
-            <if test="board_name!=null">
-                AND board_name like concat('%',#{board_name},'%')
+            <if test="forumArticleFuzzyRequestVo.attachmentType != null">
+                AND attachment_type = #{forumArticleFuzzyRequestVo.attachmentType}
             </if>
-            <if test="p_board_id != null">
-                AND p_board_id = #{p_board_id}
-            </if>
-            <if test="p_board_name!= null">
-                AND p_board_name like concat('%',#{p_board_name},'%')
-            </if>
-            <if test="user_ip_address!= null">
-                AND user_ip_address like concat('%',#{user_ip_address},'%')
-            </if>
-            <if test="title!= null">
-                AND title like concat('%',#{title},'%')
-            </if>
-            <if test="summary!= null">
-                AND summary like concat('%',#{summary},'%')
-            </if>
-            <if test="user_id!= null">
-                AND user_id = #{user_id}
-            </if>
-            <if test="nick_name">
-                AND nick_name like concat('%',#{nick_name},'%')
-            </if>
-            <if test="editor_type!= null">
-                AND editor_type = #{editor_type}
-            </if>
-            <if test="read_count!= null">
-                AND read_count = #{read_count}
-            </if>
-            <if test="good_count!= null">
-                AND good_count = #{good_count}
-            </if>
-            <if test="comment_count!= null">
-                AND comment_count = #{comment_count}
-            </if>
-            <if test="top_type!= null">
-                AND top_type = #{top_type}
-            </if>
-            <if test="attachment_type!= null">
-                AND attachment_type = #{attachment_type}
+            <if test="forumArticleFuzzyRequestVo.status != null">
+                AND status = #{forumArticleFuzzyRequestVo.status}
             </if>
         </where>
     </sql>
@@ -177,13 +141,13 @@
 
 
 
-    <select id="selectArticleList" resultType="com.jenfer.vo.ForumArticleVo" parameterType="com.jenfer.vo.ForumArticleVo">
+    <select id="selectArticleList" resultType="com.jenfer.vo.ForumArticleVo" parameterType="com.jenfer.vo.ForumArticleFuzzyRequestVo">
         select article_id,board_id,board_name,p_board_id
         ,p_board_name,user_id,nick_name,user_ip_address,title,
         cover,summary,post_time,last_update_time,read_count,
         good_count,comment_count,top_type,attachment_type,status
         from forum_article
-        <include refid="base_query_condition"></include>
+        <include refid="fuzzy_query_condition"></include>
         order by post_time desc
     </select>
 

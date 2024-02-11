@@ -9,10 +9,7 @@ import com.jenfer.annotation.VerifyParam;
 import com.jenfer.config.AdminConfig;
 import com.jenfer.constants.Constants;
 import com.jenfer.controller.base.ABaseController;
-import com.jenfer.dto.SessionWebUserDto;
-import com.jenfer.enums.ArticleStatusEnum;
 import com.jenfer.enums.PageSize;
-import com.jenfer.enums.ResponseCodeEnum;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumArticleAttachment;
@@ -20,7 +17,6 @@ import com.jenfer.pojo.ForumComment;
 import com.jenfer.service.ForumArticleAttachmentService;
 import com.jenfer.service.ForumArticleService;
 import com.jenfer.service.ForumCommentService;
-import com.jenfer.utils.SysCacheUtils;
 import com.jenfer.vo.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,9 +53,9 @@ public class ForumArticleController extends ABaseController {
     private ForumCommentService forumCommentService;
 
     @RequestMapping("loadArticle")
-    public ResponseVo loadArticle(ForumArticleRequestVo forumArticleRequestVo){
+    public ResponseVo loadArticle(ForumArticleFuzzyRequestVo forumArticleFuzzyRequestVo){
 
-        IPage<ForumArticleVo> articleByList = forumArticleService.findArticleByList(forumArticleRequestVo);
+        IPage<ForumArticleVo> articleByList = forumArticleService.findArticleByList(forumArticleFuzzyRequestVo);
         PaginationResultVo<ForumArticleVo> forumArticlePaginationResultVo = new PaginationResultVo<>();
         forumArticlePaginationResultVo.setList(articleByList.getRecords());
         forumArticlePaginationResultVo.setPageNo((int)articleByList.getCurrent());
@@ -213,7 +209,7 @@ public class ForumArticleController extends ABaseController {
         resultVo.setList(forumCommentList);
         resultVo.setPageNo(pageNo);
         resultVo.setPageSize(pageSize);
-        resultVo.setTotalCount(forumCommentList.size());
+        resultVo.setTotalCount((int)forumCommentService.count());
         return getSuccessResponseVo(convert2PaginationVo(resultVo,ForumComment.class));
     }
 

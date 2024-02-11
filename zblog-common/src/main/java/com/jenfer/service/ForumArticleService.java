@@ -5,10 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumArticleAttachment;
-import com.jenfer.vo.ForumArticleRequestVo;
+import com.jenfer.vo.ForumArticleFuzzyRequestVo;
 import com.jenfer.vo.ForumArticleVo;
-import com.jenfer.vo.PaginationResultVo;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +26,7 @@ public interface ForumArticleService extends IService<ForumArticle> {
     void updateArticle(Boolean isAdmin,ForumArticle forumArticle, ForumArticleAttachment forumArticleAttachment, MultipartFile cover,MultipartFile attachment);
 
 
-    IPage<ForumArticleVo> findArticleByList(ForumArticleRequestVo forumArticleRequestVo);
+    IPage<ForumArticleVo> findArticleByList(ForumArticleFuzzyRequestVo forumArticleFuzzyRequestVo);
 
 
     void deleteForumArticleById(String articleId);
