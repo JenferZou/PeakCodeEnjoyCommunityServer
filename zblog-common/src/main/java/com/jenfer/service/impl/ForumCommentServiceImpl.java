@@ -259,7 +259,8 @@ public class ForumCommentServiceImpl extends ServiceImpl<ForumCommentMapper, For
             return;
         }
         LambdaUpdateWrapper<ForumComment> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(ForumComment::getComment_id,commentId).set(ForumComment::getStatus,CommentStatusEnum.DEL.getStatus());
+        updateWrapper.eq(ForumComment::getComment_id,commentId)
+                .set(ForumComment::getStatus,CommentStatusEnum.DEL.getStatus());
         update(forumComment,updateWrapper);
 
         if(CommentStatusEnum.AUDIT.getStatus().equals(forumComment.getStatus())){

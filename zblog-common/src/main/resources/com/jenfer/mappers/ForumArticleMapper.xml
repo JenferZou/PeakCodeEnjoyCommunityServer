@@ -148,7 +148,7 @@
         good_count,comment_count,top_type,attachment_type,status
         from forum_article
         <include refid="fuzzy_query_condition"></include>
-        order by post_time desc
+        order by post_time desc , status desc
     </select>
 
 

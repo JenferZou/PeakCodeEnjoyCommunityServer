@@ -161,7 +161,8 @@ public class ForumArticleController extends ABaseController {
             throw new BusinessException("文章不存在");
         }
         LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        forumArticleLambdaUpdateWrapper.set(ForumArticle::getTop_type,topType);
+        forumArticleLambdaUpdateWrapper.eq(ForumArticle::getArticle_id,articleId)
+                .set(ForumArticle::getTop_type,topType);
         forumArticleService.update(forumArticle,forumArticleLambdaUpdateWrapper);
         return getSuccessResponseVo(null);
     }

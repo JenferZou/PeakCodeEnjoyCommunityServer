@@ -266,7 +266,7 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
             return;
         }
         LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        forumArticleLambdaUpdateWrapper.set(ForumArticle::getStatus,ArticleStatusEnum.DEL.getStatus());
+        forumArticleLambdaUpdateWrapper.eq(ForumArticle::getArticle_id,articleId).set(ForumArticle::getStatus,ArticleStatusEnum.DEL.getStatus());
         update(forumArticleInfo,forumArticleLambdaUpdateWrapper);
 
         Integer integral = SysCacheUtils.getSysSetting().getSysSettingPostDto().getPostIntegral();
