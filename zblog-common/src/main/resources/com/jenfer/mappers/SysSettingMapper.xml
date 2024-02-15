@@ -12,4 +12,9 @@
     <sql id="Base_Column_List">
         code,json_content
     </sql>
+    <insert id="insertOrUpdate" parameterType="com.jenfer.pojo.SysSetting">
+        INSERT INTO sys_setting(code, json_content)
+        VALUES (#{sysSetting.code}, #{sysSetting.jsonContent})
+            ON DUPLICATE KEY UPDATE json_content = VALUES(json_content);
+    </insert>
 </mapper>

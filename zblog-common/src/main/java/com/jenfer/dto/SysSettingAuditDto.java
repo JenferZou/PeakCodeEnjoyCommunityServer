@@ -1,5 +1,7 @@
 package com.jenfer.dto;
 
+import com.jenfer.annotation.VerifyParam;
+
 /**
  * 审核设置
  */
@@ -8,11 +10,14 @@ public class SysSettingAuditDto {
     /**
      * 帖子是否需要审核
      */
+    @VerifyParam(required = true)
     private Boolean postAudit;
 
     /**
      * 评论是否需要审核
+     *
      */
+    @VerifyParam(required = true)
     private Boolean commentAudit;
 
     public Boolean getPostAudit() {

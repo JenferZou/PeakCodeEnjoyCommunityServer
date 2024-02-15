@@ -4,14 +4,17 @@ package com.jenfer.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jenfer.constants.Constants;
 import com.jenfer.exception.BusinessException;
 import com.jenfer.mappers.ForumArticleMapper;
 import com.jenfer.mappers.ForumBoardMapper;
+import com.jenfer.pojo.ForumArticle;
 import com.jenfer.pojo.ForumBoard;
 import com.jenfer.service.ForumArticleService;
 import com.jenfer.service.ForumBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +60,33 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
             }
             this.baseMapper.updateById(forumBoard);
             if(!dbInfo.getBoard_name().equals(forumBoard.getBoard_name())){
-                LambdaUpdateWrapper<ForumBoard> forumBoardLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-
+                LambdaUpdateWrapper<ForumArticle> forumBoardLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                if(dbInfo.getP_board_id()==0){
+                    forumBoardLambdaUpdateWrapper.eq(ForumArticle::getP_board_id, Constants.ZERO).
+                            set(ForumArticle::getP_board_name,forumBoard.getBoard_name());
+                }
+                if(dbInfo.getP_board_id()!=0){
+                    forumBoardLambdaUpdateWrapper.ne(ForumArticle::getP_board_id, Constants.ZERO).
+                            set(ForumArticle::getBoard_name,forumBoard.getBoard_name());
+                }
+                forumArticleService.update(null, forumBoardLambdaUpdateWrapper);
             }
 
+
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changeSort(String boardIds) {
+        String[] boardIdArray = boardIds.split(",");
+        Integer index  = 1;
+        for(String boardIdStr : boardIdArray){
+            int boardId = Integer.parseInt(boardIdStr);
+            LambdaUpdateWrapper<ForumBoard> forumBoardLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            forumBoardLambdaUpdateWrapper.set(ForumBoard::getSort, index).eq(ForumBoard::getBoard_id,boardId);
+            this.baseMapper.update(null,forumBoardLambdaUpdateWrapper);
+            index++;
         }
     }
 

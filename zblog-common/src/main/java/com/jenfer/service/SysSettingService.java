@@ -1,6 +1,7 @@
 package com.jenfer.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jenfer.dto.SysSettingDto;
 import com.jenfer.pojo.SysSetting;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface SysSettingService extends IService<SysSetting> {
 
-    void refresCache();
+    SysSettingDto refresCache();
 
+    void saveSetting(SysSettingDto sysSettingDto);
 }

@@ -1,26 +1,32 @@
 package com.jenfer.dto;
 
+import com.jenfer.annotation.VerifyParam;
+
 public class SysSettingPostDto {
 
     /**
      * 发帖积分
      */
+    @VerifyParam(required = true)
     private Integer postIntegral;
 
     /**
      * 一天发帖数量
      */
+    @VerifyParam(required = true)
     private Integer postDayCountThreshold;
 
 
     /**
      * 每天上传的图片数量
      */
+    @VerifyParam(required = true)
     private Integer dayImageUploadCount;
 
     /**
      * 附件大小 单位mb
      */
+    @VerifyParam(required = true)
     private Integer attachmentSize;
 
     public Integer getPostIntegral() {

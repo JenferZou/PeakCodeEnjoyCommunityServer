@@ -1,5 +1,6 @@
 package com.jenfer.controller;
 
+import com.jenfer.annotation.GloballInterceptor;
 import com.jenfer.annotation.VerifyParam;
 import com.jenfer.constants.Constants;
 import com.jenfer.controller.base.ABaseController;
@@ -46,11 +47,25 @@ public class ForumBoardController extends ABaseController {
             forumBoard.setCover(fileUploadDto.getLocalPath());
         }
         forumBoardService.saveForumBoard(forumBoard);
-        return getSuccessResponseVo(forumBoardService.getBoardTree(null));
+        return getSuccessResponseVo(null);
     }
 
 
 
+    @RequestMapping("/delBoard")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo delBoard(@VerifyParam(required = true)Integer boardId){
+        forumBoardService.removeById(boardId);
+        return getSuccessResponseVo(null);
+    }
+
+
+    @RequestMapping("/changeBoardSort")
+    @GloballInterceptor(checkParams = true)
+    public ResponseVo changeSort(@VerifyParam(required = true)String boardIds){
+        forumBoardService.changeSort(boardIds);
+        return getSuccessResponseVo(null);
+    }
 
 
 

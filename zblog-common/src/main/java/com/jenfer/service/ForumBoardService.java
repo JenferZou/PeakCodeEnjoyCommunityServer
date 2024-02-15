@@ -20,6 +20,6 @@ public interface ForumBoardService extends IService<ForumBoard> {
     void saveForumBoard(ForumBoard forumBoard);
 
 
-
+    void changeSort(String boardIds);
 
 }

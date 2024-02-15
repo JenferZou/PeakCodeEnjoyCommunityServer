@@ -14,19 +14,8 @@ public class WebConfig extends AppConfig {
     @Value("${admin.emails:}")
     private String adminEmails;
 
-    @Value("${inner.api.appKey}")
-    private String innerApiKey;
 
-    @Value("${inner.api.appSecret}")
-    private String innerApiSecret;
 
-    public String getInnerApiKey() {
-        return innerApiKey;
-    }
-
-    public String getInnerApiSecret() {
-        return innerApiSecret;
-    }
 
     public String getAdminEmails() {
         return adminEmails;

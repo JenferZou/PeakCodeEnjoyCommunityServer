@@ -17,6 +17,21 @@ public class AdminConfig extends AppConfig{
     private String webApiUrl;
 
 
+    @Value("${inner.api.appKey}")
+    private String innerApiKey;
+
+    @Value("${inner.api.appSecret}")
+    private String innerApiSecret;
+
+
+    public String getInnerApiKey() {
+        return innerApiKey;
+    }
+
+    public String getInnerApiSecret() {
+        return innerApiSecret;
+    }
+
     public String getAdminAccount() {
         return adminAccount;
     }
