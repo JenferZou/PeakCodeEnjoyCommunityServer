@@ -15,7 +15,8 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/setting")
+@RestController
+@RequestMapping("/setting")
 public class SysSettingController extends ABaseController {
 
     @Resource
@@ -39,7 +40,8 @@ public class SysSettingController extends ABaseController {
                                   @VerifyParam SysSettingCommentDto sysSettingCommentDto,
                                   @VerifyParam SysSettingPostDto sysSettingPostDto,
                                   @VerifyParam SysSettingLikeDto sysSettingLikeDto,
-                                  @VerifyParam SysSettingEmailDto sysSettingEmailDto
+                                  @VerifyParam SysSettingEmailDto sysSettingEmailDto,
+                                  @VerifyParam SysSettingRegisterDto sysSettingRegisterDto
                                   ){
         SysSettingDto sysSettingDto = new SysSettingDto();
         sysSettingDto.setSysSettingAuditDto(sysSettingAuditDto);
@@ -47,6 +49,7 @@ public class SysSettingController extends ABaseController {
         sysSettingDto.setSysSettingPostDto(sysSettingPostDto);
         sysSettingDto.setSysSettingLikeDto(sysSettingLikeDto);
         sysSettingDto.setSysSettingEmailDto(sysSettingEmailDto);
+        sysSettingDto.setSysSettingRegisterDto(sysSettingRegisterDto);
         sysSettingService.saveSetting(sysSettingDto);
         sentWebRequest();
         return getSuccessResponseVo(null);
@@ -58,7 +61,7 @@ public class SysSettingController extends ABaseController {
         String innerApiSecret = adminConfig.getInnerApiSecret();
         long timeStamp = System.currentTimeMillis();
         String sign = StringTools.encodeMd5(appKey + timeStamp + innerApiSecret);
-        String url = adminConfig.getWebApiUrl() + "?appKey" + appKey + "&timeStamp" + timeStamp + "&sign" + sign;
+        String url = adminConfig.getWebApiUrl() + "?appKey=" + appKey + "&timeStamp=" + timeStamp + "&sign=" + sign;
         String requestJson = OKHttpUtils.getRequest(url);
         ResponseVo responseVo = JsonUtils.convertJson2Obj(requestJson, ResponseVo.class);
         if(!STATIC_SUCCESS.equals(responseVo.getStatus())){

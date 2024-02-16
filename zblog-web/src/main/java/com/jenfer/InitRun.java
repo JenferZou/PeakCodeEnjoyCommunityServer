@@ -1,5 +1,6 @@
 package com.jenfer;
 
+import com.jenfer.dto.SysSettingDto;
 import com.jenfer.service.SysSettingService;
 import jakarta.annotation.Resource;
 
@@ -15,6 +16,6 @@ public class InitRun implements ApplicationRunner {
     private SysSettingService sysSettingService;
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        sysSettingService.refresCache();
+        SysSettingDto sysSettingDto = sysSettingService.refresCache();
     }
 }

@@ -33,15 +33,15 @@ public class ForumBoardController extends ABaseController {
 
 
     @RequestMapping("/saveBoard")
-    public ResponseVo saveBoard(Integer boardId, @VerifyParam(required = true)Integer pBoardId,
-                                @VerifyParam(required = true) String boardName, String boardDesc,
-                                Integer postType, MultipartFile cover){
+    public ResponseVo saveBoard(Integer board_id, @VerifyParam(required = true)Integer p_board_id,
+                                @VerifyParam(required = true) String board_name, String board_desc,
+                                Integer post_type, MultipartFile cover){
         ForumBoard forumBoard = new ForumBoard();
-        forumBoard.setBoard_id(boardId);
-        forumBoard.setP_board_id(pBoardId);
-        forumBoard.setBoard_name(boardName);
-        forumBoard.setBoard_desc(boardDesc);
-        forumBoard.setPost_type(postType);
+        forumBoard.setBoard_id(board_id);
+        forumBoard.setP_board_id(p_board_id);
+        forumBoard.setBoard_name(board_name);
+        forumBoard.setBoard_desc(board_desc);
+        forumBoard.setPost_type(post_type);
         if(cover!=null){
            FileUploadDto fileUploadDto =  fileUtils.uploadFile2Local(cover,Constants.FILE_FOLDER_IMAGE,FileUploadTypeEnum.ARTICLE_COVER);
             forumBoard.setCover(fileUploadDto.getLocalPath());

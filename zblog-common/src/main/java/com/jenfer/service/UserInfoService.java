@@ -28,5 +28,9 @@ public interface UserInfoService extends IService<UserInfo> {
     void updateUserInfo(UserInfo userInfo, MultipartFile avatar);
 
 
+    IPage<UserInfo> findUserInfoFuzzy(Integer pageNo, Integer pageSize, String nickNameFuzzy, Integer sex, Integer status);
 
+    void updateUserStatus(String userId, Integer status);
+
+    void sendMessage(String userId, String message, Integer integral);
 }

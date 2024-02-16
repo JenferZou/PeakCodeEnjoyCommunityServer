@@ -75,6 +75,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/updateBoard")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo updateBoard(@VerifyParam(required = true) String articleId,
                                   @VerifyParam(required = true) Integer pBoardId,
                                   @VerifyParam(required = true) Integer boardId){
@@ -87,6 +88,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/getAttachment")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo getAttachment(@VerifyParam(required = true) String articleId){
         LambdaQueryWrapper<ForumArticleAttachment> forumArticleAttachmentLambdaQueryWrapper = new LambdaQueryWrapper<>();
         forumArticleAttachmentLambdaQueryWrapper.eq(ForumArticleAttachment::getArticle_id,articleId);
@@ -154,6 +156,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/topArticle")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo topArticle(@VerifyParam(required = true) String articleId,
                                  @VerifyParam(required = true) Integer topType){
         ForumArticle forumArticle = forumArticleService.getById(articleId);
@@ -170,6 +173,7 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/auditArticle")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo auditArticle(@VerifyParam(required = true) String articleIds){
         forumArticleService.auditArticle(articleIds);
         return getSuccessResponseVo(null);
@@ -217,12 +221,14 @@ public class ForumArticleController extends ABaseController {
 
 
     @RequestMapping("/delComment")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo delComment(@VerifyParam(required = true) String commentIds){
         forumCommentService.delComment(commentIds);
         return getSuccessResponseVo(null);
     }
 
     @RequestMapping("/auditComment")
+    @GloballInterceptor(checkParams = true)
     public ResponseVo auditComment(@VerifyParam(required = true) String commentIds){
         forumCommentService.auditComment(commentIds);
         return getSuccessResponseVo(null);

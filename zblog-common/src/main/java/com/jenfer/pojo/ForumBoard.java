@@ -23,7 +23,7 @@ public class ForumBoard implements Serializable {
     /**
      * 板块ID
      */
-    @TableId(value = "board_id")
+    @TableId(value = "board_id",type = IdType.AUTO)
     private Integer board_id;
 
     /**

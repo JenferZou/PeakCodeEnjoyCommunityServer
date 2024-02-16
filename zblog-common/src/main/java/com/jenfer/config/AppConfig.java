@@ -12,6 +12,23 @@ public class AppConfig {
     @Value("${isDev}")
     private Boolean isDev;
 
+    @Value("${inner.api.appKey}")
+    private String innerApiKey;
+
+    @Value("${inner.api.appSecret}")
+    private String innerApiSecret;
+
+    public Boolean getDev() {
+        return isDev;
+    }
+
+    public String getInnerApiKey() {
+        return innerApiKey;
+    }
+
+    public String getInnerApiSecret() {
+        return innerApiSecret;
+    }
 
     public Boolean getIsDev() {
         return isDev;

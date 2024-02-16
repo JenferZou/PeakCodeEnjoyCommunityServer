@@ -3,18 +3,16 @@ package com.jenfer.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jenfer.config.WebConfig;
 import com.jenfer.constants.Constants;
 import com.jenfer.dto.SessionWebUserDto;
 import com.jenfer.enums.*;
 import com.jenfer.exception.BusinessException;
-import com.jenfer.mappers.UserInfoMapper;
-import com.jenfer.mappers.UserIntegralRecordMapper;
-import com.jenfer.mappers.UserMessageMapper;
-import com.jenfer.pojo.UserInfo;
-import com.jenfer.pojo.UserIntegralRecord;
-import com.jenfer.pojo.UserMessage;
+import com.jenfer.mappers.*;
+import com.jenfer.pojo.*;
 import com.jenfer.service.EmailCodeService;
 import com.jenfer.service.UserInfoService;
 import com.jenfer.service.UserIntegralRecordService;
@@ -25,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,6 +59,13 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Autowired
     private WebConfig webConfig;
+
+
+    @Autowired
+    private ForumArticleMapper forumArticleMapper;
+
+    @Autowired
+    private ForumCommentMapper forumCommentMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -198,7 +204,61 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
         }
 
+    @Override
+    public IPage<UserInfo> findUserInfoFuzzy(Integer pageNo, Integer pageSize, String nickNameFuzzy, Integer sex, Integer status) {
+        Page<UserInfo> userInfoPage = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? Constants.LENGTH_10 : pageSize);
+        LambdaQueryWrapper<UserInfo> userInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        if(nickNameFuzzy!=null){
+            userInfoLambdaQueryWrapper.like(UserInfo::getNick_name,nickNameFuzzy);
+        }
+        if(sex!=null){
+            userInfoLambdaQueryWrapper.eq(UserInfo::getSex,sex);
+        }
+        if(status!=null){
+            userInfoLambdaQueryWrapper.eq(UserInfo::getStatus,status);
+        }
+        userInfoLambdaQueryWrapper.orderByDesc(UserInfo::getJoin_time);
+        return baseMapper.selectPage(userInfoPage,userInfoLambdaQueryWrapper);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserStatus(String userId, Integer status) {
+        if(UserStatusEnum.DISABLE.getStatus().equals(status)){
+            LambdaUpdateWrapper<ForumArticle> forumArticleLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            forumArticleLambdaUpdateWrapper.set(ForumArticle::getStatus,ArticleStatusEnum.DEL.getStatus()).eq(ForumArticle::getUser_id,userId);
+            forumArticleMapper.update(null,forumArticleLambdaUpdateWrapper);
+            LambdaUpdateWrapper<ForumComment> forumCommentLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            forumCommentLambdaUpdateWrapper.set(ForumComment::getStatus,CommentStatusEnum.DEL.getStatus()).eq(ForumComment::getUser_id,userId);
+            forumCommentMapper.update(null,forumCommentLambdaUpdateWrapper);
+        }
+        LambdaUpdateWrapper<UserInfo> userInfoLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        userInfoLambdaUpdateWrapper.set(UserInfo::getStatus,status).eq(UserInfo::getUser_id,userId);
+        baseMapper.update(null,userInfoLambdaUpdateWrapper);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void sendMessage(String userId, String message, Integer integral) {
+        UserMessage userMessage = new UserMessage();
+        userMessage.setReceived_user_id(userId);
+        userMessage.setMessage_type(MessageTypeEnum.SYS.getType());
+        userMessage.setCreate_time(new Date());
+        userMessage.setStatus(MessageStatusEnum.NO_READ.getStatus());
+        userMessage.setMessage_content(message);
+        userMessageMapper.insert(userMessage);
+
+        UserIntegralChangeTypeEnum changeTypeEnum = UserIntegralChangeTypeEnum.ADD;
+         if(integral!=null&&integral!=0){
+             if(integral<0){
+                 integral = integral*-1;
+                 changeTypeEnum = UserIntegralChangeTypeEnum.REDUCE;
+             }
+             updateUserIntegral(userId,UserIntegralOperTypeEnum.ADMIN,changeTypeEnum.getChangeType(),integral);
+         }
+
+    }
 
 
     public String getIpAddress(String ip){

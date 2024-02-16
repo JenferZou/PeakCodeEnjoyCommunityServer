@@ -35,9 +35,10 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
     public List<ForumBoard> getBoardTree(Integer postType) {
         List<ForumBoard> forumBoards = null;
         if(postType!=null){
-            forumBoards = baseMapper.selectList(new LambdaQueryWrapper<ForumBoard>().eq(ForumBoard::getPost_type,postType));
+            forumBoards = baseMapper.selectList(new LambdaQueryWrapper<ForumBoard>()
+                    .eq(ForumBoard::getPost_type,postType).orderByAsc(ForumBoard::getSort));
         }else {
-            forumBoards = baseMapper.selectList(null);
+            forumBoards = baseMapper.selectList(new LambdaQueryWrapper<ForumBoard>().orderByAsc(ForumBoard::getSort));
         }
         return convertLine2Tree(forumBoards,0);
     }
@@ -51,6 +52,7 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
             Long countbyLong = this.baseMapper.selectCount(forumBoardLambdaUpdateWrapper);
             int count = countbyLong.intValue();
             forumBoard.setSort(count+1);
+            System.out.println("boardId:=======>"+forumBoard.getBoard_id());
             this.baseMapper.insert(forumBoard);
         }else {
             //修改
