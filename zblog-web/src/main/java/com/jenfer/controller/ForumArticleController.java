@@ -247,7 +247,14 @@ public class ForumArticleController extends ABaseController {
                                    @VerifyParam(required = true,max = 150)String title,
                                    @RequestParam("p_board_id")@VerifyParam(required = true)Integer pBoardId){
         SessionWebUserDto userDto = getUserInfoFromSession(session);
-       title = StringTools.transPageHtml(title);
+        if(userDto==null){
+            throw new BusinessException("未检测到当前登录用户信息,请刷新页面或重新登陆");
+        }
+        UserInfo user = userInfoService.getById(userDto.getUserId());
+        if(user.getStatus().equals(0)){
+            throw new BusinessException("当前账号状态处于禁用,请联系管理员");
+        }
+        title = StringTools.transPageHtml(title);
         ForumArticle forumArticle = new ForumArticle();
         forumArticle.setP_board_id(pBoardId);
         forumArticle.setBoard_id(boardId);

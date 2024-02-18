@@ -14,6 +14,27 @@
     <packaging>pom</packaging>
     <name>zblogpro</name>
     <description>zblogpro</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <modules>
         <module>zblog-common</module>
         <module>zblog-web</module>
@@ -35,6 +56,8 @@
     </properties>
 
 
+
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -49,6 +72,11 @@
                 <version>${springboot.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.jenfer</groupId>
+                <artifactId>zblog-common</artifactId>
+                <version>1.0</version>
+            </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -180,21 +208,5 @@
 
 
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>-->
-<!--                            <groupId>org.projectlombok</groupId>-->
-<!--                            <artifactId>lombok</artifactId>-->
-<!--                        </exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
 
 </project>
